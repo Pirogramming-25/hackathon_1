@@ -1,0 +1,49 @@
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.http import JsonResponse
+from django.urls import include, path
+
+
+def health_check(request):
+    return JsonResponse(
+        {
+            "success": True,
+            "message": "Server is running.",
+        }
+    )
+
+
+def index(request):
+    return JsonResponse(
+        {
+            "success": True,
+            "message": "Hackathon backend server is running.",
+            "endpoints": {
+                "admin": "/admin/",
+                "health": "/api/health/",
+                "auth": "/api/auth/",
+                "guides": "/api/guides/",
+                "questions": "/api/questions/",
+                "families": "/api/families/",
+            },
+        }
+    )
+
+
+urlpatterns = [
+    path("", index),
+    path("admin/", admin.site.urls),
+    path("api/health/", health_check),
+
+    path("api/auth/", include("accounts.urls")),
+    path("api/guides/", include("guides.urls")),
+    path("api/questions/", include("questions.urls")),
+    path("api/families/", include("families.urls")),
+]
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT,
+    )
