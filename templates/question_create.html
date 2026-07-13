@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}질문 작성{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/question_create.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="question-create-page">
+  <h1>질문 작성</h1>
+
+  <form id="question-create-form">
+    <label for="question-title">제목</label>
+    <input
+      type="text"
+      id="question-title"
+      maxlength="200"
+      required
+    >
+
+    <label for="question-category">카테고리</label>
+    <select id="question-category" required>
+      <option value="">선택해주세요</option>
+      <option value="GOVERNMENT">정부</option>
+      <option value="FINANCE">금융</option>
+      <option value="MEDICAL">의료</option>
+      <option value="LIFE">생활</option>
+      <option value="ETC">기타</option>
+    </select>
+
+    <label for="question-content">질문 내용</label>
+    <textarea
+      id="question-content"
+      rows="10"
+      required
+    ></textarea>
+
+    <label for="question-images">이미지 첨부</label>
+    <input
+      type="file"
+      id="question-images"
+      accept="image/jpeg,image/png,image/webp"
+      multiple
+    >
+
+    <div id="image-description-list"></div>
+
+    <p id="question-form-error"></p>
+
+    <button type="submit" id="question-submit-button">
+      질문 등록
+    </button>
+  </form>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/question_create.js' %}"></script>
+{% endblock %}

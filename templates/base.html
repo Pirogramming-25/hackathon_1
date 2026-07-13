@@ -27,34 +27,34 @@
         <span class="material-symbols-rounded">home</span> 검색하기
       </a>
 
-      <a href="{% if user.is_authenticated %}{% url 'guides:create' %}{% else %}{% url 'accounts:login' %}?next={% url 'guides:create' %}{% endif %}"
-         class="nav-btn {% if active_nav == 'guide_write' %}is-active{% endif %}">
+      <a href="#"
+          class="nav-btn {% if active_nav == 'guide_write' %}is-active{% endif %}">
         <span class="material-symbols-rounded">edit</span> 설명서 작성
       </a>
 
-      <a href="{% url 'questions:list' %}" class="nav-btn {% if active_nav == 'question_list' %}is-active{% endif %}">
+      <a href="{% url 'question_page_list' %}" class="nav-btn {% if active_nav == 'question_list' %}is-active{% endif %}">
         <span class="material-symbols-rounded">help</span> 질문 목록
       </a>
 
-      <a href="{% if user.is_authenticated %}{% url 'mypage:storage' %}{% else %}{% url 'accounts:login' %}?next={% url 'mypage:storage' %}{% endif %}"
-         class="nav-btn {% if active_nav == 'storage' %}is-active{% endif %}">
+      <a href="#"
+          class="nav-btn {% if active_nav == 'storage' %}is-active{% endif %}">
         <span class="material-symbols-rounded">bookmark</span> 나의 저장소
       </a>
 
-      <a href="{% if user.is_authenticated %}{% url 'mypage:info' %}{% else %}{% url 'accounts:login' %}?next={% url 'mypage:info' %}{% endif %}"
-         class="nav-btn {% if active_nav == 'my_info' %}is-active{% endif %}">
+      <a href="/my-info/"
+          class="nav-btn {% if active_nav == 'my_info' %}is-active{% endif %}">
         <span class="material-symbols-rounded">person</span> 나의 정보
       </a>
 
       {% if user.is_authenticated %}
-        <form action="{% url 'accounts:logout' %}" method="post" style="margin-left:auto;">
+        <form action="/api/auth/logout/" method="post" style="margin-left:auto;">
           {% csrf_token %}
           <button type="submit" class="nav-btn nav-btn-exit">
             <span class="material-symbols-rounded">logout</span> 로그아웃
           </button>
         </form>
       {% else %}
-        <a href="{% url 'accounts:login' %}" class="nav-btn nav-btn-exit">
+        <a href="/login/" class="nav-btn nav-btn-exit">
           <span class="material-symbols-rounded">login</span> 로그인
         </a>
       {% endif %}

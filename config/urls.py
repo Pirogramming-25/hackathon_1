@@ -3,6 +3,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import include, path
+from django.views.generic import TemplateView
 
 
 def health_check(request):
@@ -33,7 +34,27 @@ def index(request):
 
 
 urlpatterns = [
-    path("", index),
+    path("", index, name="home"),
+
+    path(
+        "questions/",
+        TemplateView.as_view(
+            template_name="question_list.html",
+            extra_context={"active_nav": "question_list"},
+        ),
+        name="question_page_list",
+    ),
+    path(
+        "questions/create/",
+        TemplateView.as_view(template_name="question_create.html"),
+        name="question_create",
+    ),
+    path(
+        "questions/<int:pk>/",
+        TemplateView.as_view(template_name="question_detail.html"),
+        name="question_detail",
+    ),
+
     path("admin/", admin.site.urls),
     path("api/health/", health_check),
 
