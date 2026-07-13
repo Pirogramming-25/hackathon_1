@@ -92,7 +92,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.delete()
-        return success_response({}, "질문이 삭제되었습니다.")
+        return success_response(None, "질문이 삭제되었습니다.")
 
     # ---------- 상태 변경 ----------
 
@@ -160,7 +160,7 @@ class AnswerViewSet(
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.delete()
-        return success_response({}, "답변이 삭제되었습니다.")
+        return success_response(None, "답변이 삭제되었습니다.")
 
     @action(
         detail=True,
