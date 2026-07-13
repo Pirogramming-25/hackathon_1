@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+<!-- home 전용 CSS 연결 -->
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="search-container">
+    <h1>무엇이 궁금하신가요?</h1>
+    
+    <!-- 검색창 영역 -->
+    <form action="#" method="GET" class="search-box">
+        <span class="material-symbols-rounded search-icon-left">add</span>
+        <input type="text" name="q" class="search-input" placeholder="궁금한 것을 입력해주세요 (예: 카카오톡 증명서 발급)">
+        <button type="submit" style="background:none; border:none; padding:0;">
+            <span class="material-symbols-rounded search-icon-right" style="font-size: 32px;">search</span>
+        </button>
+    </form>
+
+    <!-- 하단 안내 문구 -->
+    <div class="search-guide">
+        <h2>검색이 막막하신가요?</h2>
+        <p>이렇게 입력해보세요.</p>
+        <br>
+        <p><strong>- 어디에서? :</strong> 정부 24, 카카오톡</p>
+        <p><strong>- 무엇을? :</strong> 예약, 증명서 발급</p>
+    </div>
+</div>
+{% endblock content %}
