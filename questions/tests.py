@@ -490,7 +490,26 @@ class AnswerAPITests(APITestCase):
         self.answer.refresh_from_db()
         second_answer.refresh_from_db()
         self.assertFalse(self.answer.is_accepted)
-        self.assertTrue(second_answer.is_accepted)    
+        self.assertTrue(second_answer.is_accepted)
+
+    def test_accepted_answer_cannot_be_updated(self):
+        self.answer.is_accepted = True
+        self.answer.save(update_fields=["is_accepted"])
+
+        self.client.force_authenticate(user=self.answer_author)
+        response = self.client.patch(
+            f"/api/answers/{self.answer.id}/", {"content": "수정 시도"}
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_accepted_answer_cannot_be_deleted(self):
+        self.answer.is_accepted = True
+        self.answer.save(update_fields=["is_accepted"])
+
+        self.client.force_authenticate(user=self.answer_author)
+        response = self.client.delete(f"/api/answers/{self.answer.id}/")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue(Answer.objects.filter(id=self.answer.id).exists())    
 
     def test_database_rejects_multiple_accepted_answers_for_same_question(self):
         # 첫 번째 답변을 선택 상태로 설정
