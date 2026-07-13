@@ -33,11 +33,11 @@ document.addEventListener('DOMContentLoaded', function() {
         wrapper.style.zIndex = '10';
 
         // ① 빨간 동그라미 생성
-        const circle = document.createlement('div');
+        const circle = document.createElement('div');
         circle.className = 'annotation-circle';
 
         // ② 텍스트 입력창 생성
-        const input = document.createlement('input');
+        const input = document.createElement('input');
         input.type = 'text';
         input.className = 'annotation-input';
         input.placeholder = '설명을 입력하세요';
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // ③ 삭제(X) 버튼 생성
-        const deleteBtn = document.createlement('button');
+        const deleteBtn = document.createElement('button');
         deleteBtn.className = 'annotation-delete';
         deleteBtn.innerHTML = 'X';
         deleteBtn.title = '주석 삭제';
