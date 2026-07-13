@@ -1,6 +1,7 @@
 import os
 import tempfile
 from io import BytesIO
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -180,6 +181,33 @@ class QuestionAPITests(APITestCase):
         self.assertTrue(response.data["success"])
         self.assertEqual(response.data["data"]["title"], "새 질문")
 
+    def test_create_question_rolls_back_when_image_save_fails(self):
+        self.client.force_authenticate(user=self.author)
+        question_count_before = Question.objects.count()
+
+        payload = {
+            "title": "롤백 테스트 질문",
+            "content": "내용",
+            "category": "LIFE",
+            "images": [make_image("rollback-question.png")],
+        }
+
+        with patch(
+            "questions.serializers.QuestionCreateUpdateSerializer._save_images",
+        side_effect=RuntimeError("이미지 저장 실패"),
+        ):
+            with self.assertRaises(RuntimeError):
+                self.client.post(
+                    "/api/questions/",
+                    payload,
+                    format="multipart",
+                )
+
+        self.assertEqual(
+            Question.objects.count(),
+            question_count_before,
+        )
+
     def test_create_question_with_6_images_fails(self):
         self.client.force_authenticate(user=self.author)
         payload = {
@@ -279,6 +307,7 @@ class QuestionAPITests(APITestCase):
         self.assertEqual(self.question.images.count(), 1)
 
 
+
 # =========================================================
 # 답변 API 테스트
 # =========================================================
@@ -308,6 +337,31 @@ class AnswerAPITests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(response.data["success"])
+
+    def test_create_answer_rolls_back_when_image_save_fails(self):
+        self.client.force_authenticate(user=self.other)
+        answer_count_before = Answer.objects.count()
+
+        payload = {
+            "content": "롤백 테스트 답변",
+            "images": [make_image("rollback-answer.png")],
+        }
+
+        with patch(
+            "questions.serializers.AnswerCreateUpdateSerializer._save_images",
+            side_effect=RuntimeError("이미지 저장 실패"),
+        ):
+            with self.assertRaises(RuntimeError):
+                self.client.post(
+                    f"/api/questions/{self.question.id}/answers/",
+                    payload,
+                    format="multipart",
+                )
+
+        self.assertEqual(
+            Answer.objects.count(),
+            answer_count_before,
+        )
 
     def test_create_answer_with_5_images_fails(self):
         self.client.force_authenticate(user=self.other)
