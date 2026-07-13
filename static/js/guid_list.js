@@ -1,75 +1,24 @@
-// guid_list.js
+/* static/js/guid_list.js */
 
-document.addEventListener("DOMContentLoaded", () => {
-
+document.addEventListener('DOMContentLoaded', () => {
+    
     // ==========================
-    // 정렬 버튼
+    // 필터 버튼 활성화 토글 기능
     // ==========================
-
-    const sortButtons = document.querySelectorAll(".sort-btn");
-
-    sortButtons.forEach((button) => {
-
-        button.addEventListener("click", () => {
-
-            sortButtons.forEach((btn) => {
-                btn.classList.remove("active");
-            });
-
-            button.classList.add("active");
-
-            // TODO : Django 연결 시 fetch로 정렬 요청
-            console.log(button.textContent.trim());
-
+    
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // 1. 모든 버튼에서 'active' 클래스를 제거합니다.
+            filterBtns.forEach(b => b.classList.remove('active'));
+            
+            // 2. 현재 클릭한 버튼에만 'active' 클래스를 추가합니다.
+            btn.classList.add('active');
+            
+            // 프론트 시연용 확인 코드 (콘솔창)
+            console.log(`${btn.textContent} 정렬 선택됨`);
         });
-
-    });
-
-
-    // ==========================
-    // 검색
-    // ==========================
-
-    const searchForm = document.querySelector(".guide-search");
-
-    searchForm.addEventListener("submit", (e) => {
-
-        e.preventDefault();
-
-        const keyword = searchForm.querySelector("input").value.trim();
-
-        if(keyword === ""){
-
-            alert("검색어를 입력해주세요.");
-
-            return;
-
-        }
-
-        // TODO : Django 검색 URL 연결
-
-        console.log(keyword);
-
-        // 예시
-        // window.location.href = `/guides/?q=${encodeURIComponent(keyword)}`;
-
-    });
-
-
-    // ==========================
-    // 카드 Hover
-    // ==========================
-
-    const cards = document.querySelectorAll(".guide-card");
-
-    cards.forEach((card) => {
-
-        card.addEventListener("mouseenter", () => {
-
-            card.style.cursor = "pointer";
-
-        });
-
     });
 
 });

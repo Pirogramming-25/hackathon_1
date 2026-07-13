@@ -1,296 +1,92 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}
-설명서 상세
-{% endblock %}
+{% block title %}카카오톡 증명서 발급 - 똑디{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/guid_detail.css' %}">
 {% endblock %}
 
 {% block content %}
-
-<div class="guide-detail-page">
-
-    <!-- 상단 -->
-
-    <div class="guide-header">
-
-        <div class="guide-title">
-
-            <h1>카카오톡 증명서 발급하기</h1>
-
-            <div class="guide-info">
-
-                <span>📱 카카오톡</span>
-
-                <span>⏱ 약 3분</span>
-
-                <span>👁 조회 231</span>
-
-            </div>
-
-        </div>
-
-        <div class="guide-action">
-
-            <button class="save-btn">
-
-                <span class="material-symbols-rounded">
-                    bookmark
-                </span>
-
-                저장하기
-
+<div class="guide-detail-page page-wrap">
+    
+    <!-- 상단 헤더 영역 -->
+    <div class="detail-header">
+        <h1 class="detail-title">[ 카카오톡 증명서 발급하기 ]</h1>
+        <div class="header-actions">
+            <button type="button" class="save-btn">
+                <span class="material-symbols-rounded">bookmark</span> 저장하기
             </button>
-
-            <button class="like-btn">
-
-                <span class="material-symbols-rounded">
-                    thumb_up
-                </span>
-
-                도움이 됐어요
-
+            <button type="button" class="like-btn">
+                <span class="material-symbols-rounded">thumb_up</span> 도움이 됐어요
             </button>
-
         </div>
-
     </div>
 
-
-    <!-- STEP NAV -->
-
-    <aside class="step-nav">
-
-        <a href="#step1">1</a>
-        <a href="#step2">2</a>
-        <a href="#step3">3</a>
-        <a href="#step4">4</a>
-        <a href="#step5">5</a>
-        <a href="#step6">6</a>
-        <a href="#step7">7</a>
-        <a href="#step8">8</a>
-
-    </aside>
-
-
-    <!-- STEP -->
-
-    <div class="guide-content">
-
-
-        <!-- STEP 1 -->
-
-        <section class="step-card" id="step1">
-
-            <div class="step-number">
-
-                STEP 1
-
+    <!-- 메인 레이아웃 (좌측 콘텐츠 / 우측 스텝 고정 바) -->
+    <div class="detail-layout">
+        
+        <!-- 좌측: 시각적 스크린샷 및 설명 영역 -->
+        <div class="content-area">
+            
+            <!-- STEP 1 -->
+            <div id="step1" class="step-section">
+                <div class="step-card">
+                    <!-- 실제 이미지가 들어갈 자리 (시연용 회색 박스) -->
+                    <div class="step-image-placeholder">
+                        <!-- 나중에 백엔드에서 이미지 띄울 때 예시: <img src="{{ step.image.url }}" alt="1단계"> -->
+                    </div>
+                    <p class="step-desc">＞ 좌측 상단의 검색 버튼 누르기</p>
+                </div>
             </div>
 
-            <div class="step-image">
-
-                <img src="{% static 'images/sample1.png' %}" alt="step1">
-
+            <!-- STEP 2 -->
+            <div id="step2" class="step-section">
+                <div class="step-card">
+                    <div class="step-image-placeholder"></div>
+                    <p class="step-desc">＞ 검색창에 '증명서'를 입력하고 아래로 내리세요.</p>
+                </div>
             </div>
 
-            <div class="step-description">
-
-                좌측 상단의 <b>검색</b> 버튼을 눌러주세요.
-
+            <!-- STEP 3 -->
+            <div id="step3" class="step-section">
+                <div class="step-card">
+                    <div class="step-image-placeholder"></div>
+                    <p class="step-desc">＞ 필요한 증명서를 선택한 후 발급 버튼을 누르세요.</p>
+                </div>
             </div>
 
-        </section>
-
-
-
-        <!-- STEP 2 -->
-
-        <section class="step-card" id="step2">
-
-            <div class="step-number">
-
-                STEP 2
-
+            <!-- STEP 4 -->
+            <div id="step4" class="step-section">
+                <div class="step-card">
+                    <div class="step-image-placeholder"></div>
+                    <p class="step-desc">＞ 비밀번호를 입력하면 발급이 완료됩니다!</p>
+                </div>
             </div>
 
-            <div class="step-image">
-
-                <img src="{% static 'images/sample2.png' %}" alt="step2">
-
-            </div>
-
-            <div class="step-description">
-
-                검색창에 <b>증명서</b>를 입력합니다.
-
-            </div>
-
-        </section>
-
-
-
-        <!-- STEP 3 -->
-
-        <section class="step-card" id="step3">
-
-            <div class="step-number">
-
-                STEP 3
-
-            </div>
-
-            <div class="step-image">
-
-                <img src="{% static 'images/sample3.png' %}" alt="step3">
-
-            </div>
-
-            <div class="step-description">
-
-                원하는 서비스를 선택합니다.
-
-            </div>
-
-        </section>
-
-
-
-        <!-- STEP 4 -->
-
-        <section class="step-card" id="step4">
-
-            <div class="step-number">
-
-                STEP 4
-
-            </div>
-
-            <div class="step-image">
-
-                <img src="{% static 'images/sample4.png' %}" alt="step4">
-
-            </div>
-
-            <div class="step-description">
-
-                필요한 정보를 입력합니다.
-
-            </div>
-
-        </section>
-
-
-
-        <!-- STEP 5 -->
-
-        <section class="step-card" id="step5">
-
-            <div class="step-number">
-
-                STEP 5
-
-            </div>
-
-            <div class="step-image">
-
-                <img src="{% static 'images/sample5.png' %}" alt="step5">
-
-            </div>
-
-            <div class="step-description">
-
-                신청 버튼을 눌러주세요.
-
-            </div>
-
-        </section>
-
-
-
-        <!-- STEP 6 -->
-
-        <section class="step-card" id="step6">
-
-            <div class="step-number">
-
-                STEP 6
-
-            </div>
-
-            <div class="step-image">
-
-                <img src="{% static 'images/sample6.png' %}" alt="step6">
-
-            </div>
-
-            <div class="step-description">
-
-                본인 인증을 진행합니다.
-
-            </div>
-
-        </section>
-
-
-
-        <!-- STEP 7 -->
-
-        <section class="step-card" id="step7">
-
-            <div class="step-number">
-
-                STEP 7
-
-            </div>
-
-            <div class="step-image">
-
-                <img src="{% static 'images/sample7.png' %}" alt="step7">
-
-            </div>
-
-            <div class="step-description">
-
-                발급 완료 화면을 확인합니다.
-
-            </div>
-
-        </section>
-
-
-
-        <!-- STEP 8 -->
-
-        <section class="step-card" id="step8">
-
-            <div class="step-number">
-
-                STEP 8
-
-            </div>
-
-            <div class="step-image">
-
-                <img src="{% static 'images/sample8.png' %}" alt="step8">
-
-            </div>
-
-            <div class="step-description">
-
-                완료되었습니다.
-
-            </div>
-
-        </section>
+        </div>
+
+        <!-- 우측: Duolingo처럼 친근하고 큼직한 숫자 네비게이션 바 -->
+        <aside class="step-nav-area">
+            <nav class="step-nav">
+                <!-- href의 ID와 좌측 step-section의 ID가 일치하여 스크롤이 이동합니다 -->
+                <a href="#step1" class="step-link active">1</a>
+                <a href="#step2" class="step-link">2</a>
+                <a href="#step3" class="step-link">3</a>
+                <a href="#step4" class="step-link">4</a>
+                <a href="#" class="step-link">5</a>
+                <a href="#" class="step-link">6</a>
+                <a href="#" class="step-link">7</a>
+                <a href="#" class="step-link">8</a>
+                <a href="#" class="step-link">9</a>
+                <a href="#" class="step-link">10</a>
+                <a href="#" class="step-link">11</a>
+            </nav>
+        </aside>
 
     </div>
 
 </div>
-
 {% endblock %}
 
 {% block extra_js %}
