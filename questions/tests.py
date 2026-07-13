@@ -183,6 +183,40 @@ class QuestionAPITests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_update_question_replaces_images(self):
+        self.client.force_authenticate(user=self.author)
+        QuestionImage.objects.create(
+            question=self.question, image=make_image("old.png"), display_order=1
+        )
+        self.assertEqual(self.question.images.count(), 1)
+
+        payload = {
+            "title": "이미지 교체된 질문",
+            "images": [make_image("new1.png"), make_image("new2.png")],
+        }
+        response = self.client.patch(
+            f"/api/questions/{self.question.id}/", payload, format="multipart"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.question.refresh_from_db()
+        self.assertEqual(self.question.images.count(), 2)
+
+    def test_update_question_without_images_keeps_existing(self):
+        self.client.force_authenticate(user=self.author)
+        QuestionImage.objects.create(
+            question=self.question, image=make_image("keep.png"), display_order=1
+        )
+        self.assertEqual(self.question.images.count(), 1)
+
+        response = self.client.patch(
+            f"/api/questions/{self.question.id}/", {"title": "제목만 수정"}
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.question.refresh_from_db()
+        self.assertEqual(self.question.images.count(), 1)
+
 
 # =========================================================
 # 답변 API 테스트
