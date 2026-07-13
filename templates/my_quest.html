@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+내가 등록한 질문
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/my_quest.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="my-quest-page">
+
+    <div class="page-header">
+
+        <h1>내가 등록한 질문</h1>
+
+        <p>내가 등록한 질문을 확인하고 관리해보세요.</p>
+
+    </div>
+
+    <!-- 검색 -->
+
+    <section class="search-section">
+
+        <form class="question-search">
+
+            <span class="material-symbols-rounded">
+                search
+            </span>
+
+            <input
+                type="text"
+                placeholder="질문 제목을 검색해보세요."
+            >
+
+            <button type="submit">
+                검색
+            </button>
+
+        </form>
+
+    </section>
+
+    <!-- 정렬 -->
+
+    <section class="sort-section">
+
+        <button class="sort-btn active">
+            최신순
+        </button>
+
+        <button class="sort-btn">
+            답변완료
+        </button>
+
+        <button class="sort-btn">
+            답변대기
+        </button>
+
+    </section>
+
+    <!-- 질문 목록 -->
+
+    <section class="question-list">
+
+        <a href="{% url 'questions:detail' 1 %}" class="question-card">
+
+            <div class="question-content">
+
+                <h3>정부24에서 가족관계증명서는 어디서 발급하나요?</h3>
+
+                <p>답변 대기중</p>
+
+            </div>
+
+            <span class="material-symbols-rounded">
+                chevron_right
+            </span>
+
+        </a>
+
+        <a href="{% url 'questions:detail' 2 %}" class="question-card">
+
+            <div class="question-content">
+
+                <h3>카카오톡 사진을 여러 장 보내는 방법이 궁금합니다.</h3>
+
+                <p>답변 완료</p>
+
+            </div>
+
+            <span class="material-symbols-rounded">
+                chevron_right
+            </span>
+
+        </a>
+
+        <a href="{% url 'questions:detail' 3 %}" class="question-card">
+
+            <div class="question-content">
+
+                <h3>키오스크에서 카드 결제는 어떻게 하나요?</h3>
+
+                <p>답변 완료</p>
+
+            </div>
+
+            <span class="material-symbols-rounded">
+                chevron_right
+            </span>
+
+        </a>
+
+        <a href="{% url 'questions:detail' 4 %}" class="question-card">
+
+            <div class="question-content">
+
+                <h3>병원 예약 취소는 어디서 하나요?</h3>
+
+                <p>답변 대기중</p>
+
+            </div>
+
+            <span class="material-symbols-rounded">
+                chevron_right
+            </span>
+
+        </a>
+
+        <a href="{% url 'questions:detail' 5 %}" class="question-card">
+
+            <div class="question-content">
+
+                <h3>버스 예매 후 취소하는 방법을 알려주세요.</h3>
+
+                <p>답변 완료</p>
+
+            </div>
+
+            <span class="material-symbols-rounded">
+                chevron_right
+            </span>
+
+        </a>
+
+    </section>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/my_quest.js' %}"></script>
+{% endblock %}

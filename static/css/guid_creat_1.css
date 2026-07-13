@@ -1,0 +1,153 @@
+/* static/css/guid_create_1.css */
+
+.guide-create-page {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 40px;
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+}
+
+.page-header {
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.page-header h1 {
+    font-size: var(--font-h1);
+    font-weight: 800;
+    color: var(--color-text);
+    margin-bottom: 16px;
+}
+
+.page-header p {
+    font-size: var(--font-body);
+    color: var(--color-text-sub);
+}
+
+.form-group {
+    margin-bottom: 32px;
+}
+
+.form-group > label {
+    display: block;
+    font-size: var(--font-card-title);
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--color-text);
+}
+
+.form-group input[type="text"],
+.form-group select {
+    width: 100%;
+    height: 60px;
+    padding: 0 24px;
+    font-size: var(--font-body);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    outline: none;
+    color: var(--color-text);
+    background-color: var(--color-white);
+    transition: border-color var(--transition-base), box-shadow var(--transition-base);
+    appearance: none; 
+}
+
+.form-group input[type="text"]:focus,
+.form-group select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 4px var(--color-primary-light);
+}
+
+.form-group input[type="text"]::placeholder {
+    color: var(--color-text-sub);
+}
+
+.form-group select {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7684' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    background-size: 24px;
+    padding-right: 60px;
+    cursor: pointer;
+}
+
+.upload-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    background-color: var(--color-bg-soft);
+    border: 2px dashed var(--color-primary);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    text-align: center;
+    transition: background-color var(--transition-base), transform var(--transition-base);
+}
+
+.upload-box:hover {
+    background-color: var(--color-primary-light);
+    transform: translateY(-2px);
+}
+
+.upload-icon {
+    font-size: 48px !important;
+    color: var(--color-primary);
+    margin-bottom: 16px;
+}
+
+.upload-box h3 {
+    font-size: var(--font-card-title);
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--color-text);
+}
+
+.upload-box p {
+    font-size: var(--font-body);
+    color: var(--color-text-sub);
+    margin-bottom: 12px;
+}
+
+.upload-box small {
+    font-size: var(--font-small);
+    color: var(--color-primary); 
+    font-weight: 600;
+}
+
+.preview-area {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.submit-area {
+    margin-top: 48px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.next-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+    padding: 0 40px;
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    font-size: var(--font-button);
+    font-weight: 700;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color var(--transition-base), transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.next-btn:hover {
+    background-color: var(--color-primary-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
+}
