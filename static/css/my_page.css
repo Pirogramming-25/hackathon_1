@@ -1,0 +1,156 @@
+/* =====================================
+   똑디 마이페이지
+   static/css/my_page.css
+===================================== */
+
+
+/* =====================
+   마이페이지 전체
+===================== */
+
+.mypage-page {
+
+    min-height: calc(100vh - 92px);
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 40px 24px;
+
+}
+
+
+
+
+/* =====================
+   마이페이지 카드
+===================== */
+
+.mypage-container {
+
+    width: 100%;
+
+    max-width: 950px;
+
+    padding: 60px 70px;
+
+}
+
+
+
+/* =====================
+   메뉴 한 줄
+===================== */
+
+.menu-row {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 60px;
+
+    padding: 45px 0;
+
+}
+
+
+
+.menu-row + .menu-row {
+
+    border-top: 1px solid var(--color-border);
+
+}
+
+
+
+
+/* =====================
+   설명 영역
+===================== */
+
+.menu-text {
+
+    flex: 1;
+
+}
+
+
+
+.menu-text h2 {
+
+    margin-bottom: 16px;
+
+}
+
+
+
+.menu-text p {
+
+    margin: 0;
+
+    line-height: 1.6;
+
+}
+
+
+
+
+/* =====================
+   버튼
+===================== */
+
+.menu-row .btn {
+
+    min-width: 180px;
+
+    flex-shrink: 0;
+
+}
+
+
+
+
+
+/* =====================
+   반응형
+===================== */
+
+@media (max-width: 768px) {
+
+
+    .mypage-container {
+
+        padding: 32px 24px;
+
+    }
+
+
+
+    .menu-row {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 24px;
+
+        text-align: center;
+
+    }
+
+
+
+    .menu-row .btn {
+
+        width: 100%;
+
+    }
+
+
+}

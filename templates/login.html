@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block title %}
+로그인 - 똑디
+{% endblock %}
+
+
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %}
+
+
+
+{% block content %}
+
+<main class="login-page">
+
+    <section class="login-container card">
+
+
+        <!-- 환영 문구 -->
+        <div class="login-title">
+
+            <h1 class="text-h2">
+                😊 똑디에 오신 것을 환영합니다 😊
+            </h1>
+
+            <p class="text-small">
+                디지털 설명서로 더 쉽고 편하게 배워보세요
+            </p>
+
+        </div>
+
+
+
+
+        <!-- 로그인 폼 -->
+        <form class="login-form" method="post">
+
+            {% csrf_token %}
+
+
+            <!-- 아이디 -->
+            <div class="input-box">
+
+                <label for="username">
+                    아이디를 입력해주세요
+                </label>
+
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="아이디 입력"
+                    required
+                >
+
+            </div>
+
+
+
+
+            <!-- 비밀번호 -->
+            <div class="input-box">
+
+                <label for="password">
+                    비밀번호를 입력해주세요
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="비밀번호 입력"
+                    required
+                >
+
+            </div>
+
+
+
+
+            <!-- 로그인 버튼 -->
+            <button
+                type="submit"
+                class="btn btn-primary btn-block"
+            >
+                다 입력했어요!
+            </button>
+
+
+        </form>
+
+
+
+
+        <!-- 회원가입 이동 -->
+        <div class="signup-area">
+
+            <p class="text-body">
+                혹시 똑디가 처음이라면?
+            </p>
+
+
+            <a href="{% url 'signup' %}" class="btn btn-secondary">
+                회원가입 하러가기
+            </a>
+
+
+        </div>
+
+
+
+    </section>
+
+
+</main>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/login.js' %}"></script>
+{% endblock %}

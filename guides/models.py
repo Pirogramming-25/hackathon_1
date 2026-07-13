@@ -22,6 +22,14 @@ class Guide(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    source_answer = models.OneToOneField(
+        "questions.Answer",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="promoted_guide",
+    )
+
     class Meta:
         ordering = ['-created_at']
 
@@ -57,3 +65,22 @@ class GuideScrap(models.Model):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=['user', 'guide'], name='unique_guide_scrap')]
+
+class GuideShare(models.Model):
+    guide = models.ForeignKey(Guide, on_delete=models.CASCADE, related_name="shares")
+    
+    family_relation = models.ForeignKey(
+        "families.FamilyRelation", 
+        on_delete=models.CASCADE, 
+        related_name="guide_shares",
+        null=True,   
+        blank=True
+    )
+    
+    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="received_guide_shares")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["guide", "recipient"], name="unique_guide_share_recipient")
+        ]

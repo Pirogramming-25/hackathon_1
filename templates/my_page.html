@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block title %}
+마이페이지 - 똑디
+{% endblock %}
+
+
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/my_page.css' %}">
+{% endblock %}
+
+
+
+{% block content %}
+
+<main class="mypage-page">
+
+
+    <section class="mypage-container card">
+
+
+        <!-- 내 정보 수정 -->
+        <div class="menu-row">
+
+
+            <div class="menu-text">
+
+                <h2 class="text-card-title">
+                    내 정보 수정
+                </h2>
+
+
+                <p class="text-body">
+                    나의 정보를 수정하고 싶다면?<br>
+                    오른쪽 버튼을 눌러주세요!
+                </p>
+
+            </div>
+
+
+
+            <a href="{% url 'my_info' %}" class="btn btn-primary">
+                내 정보 수정
+            </a>
+
+
+        </div>
+
+
+
+
+
+        <!-- 가족 연동 -->
+        <div class="menu-row">
+
+
+            <div class="menu-text">
+
+                <h2 class="text-card-title">
+                    가족 연동
+                </h2>
+
+
+                <p class="text-body">
+                    나의 가족과 연동된 페이지를 보고 싶다면?<br>
+                    오른쪽 버튼을 눌러주세요!
+                </p>
+
+            </div>
+
+
+
+            <a href="{% url 'family_connect' %}" class="btn btn-primary">
+                가족 연동
+            </a>
+
+
+        </div>
+
+
+
+    </section>
+    
+</main>
+
+
+{% endblock %}
+
+
+
+
+{% block extra_js %}
+<script src="{% static 'js/my_page.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block title %}
+회원가입 - 똑디
+{% endblock %}
+
+
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/signup.css' %}">
+{% endblock %}
+
+
+
+{% block content %}
+
+<main class="signup-page">
+
+
+    <!-- 왼쪽 소개 영역 -->
+    <section class="signup-intro">
+
+
+        <h1 class="text-h1">
+            회원가입 페이지입니다.
+        </h1>
+
+
+        <p class="text-body">
+            똑디의 가족이 되어주세요 😊
+        </p>
+
+
+        <span class="text-small">
+            디지털 설명서를 통해 더 편리한 생활을 시작해보세요.
+        </span>
+
+
+    </section>
+
+
+
+
+
+    <!-- 회원가입 카드 -->
+    <section class="signup-card card">
+
+
+        <form class="signup-form" method="post">
+
+            {% csrf_token %}
+
+
+
+            <!-- 아이디 -->
+            <div class="form-group">
+
+                <label for="username">
+                    원하시는 아이디를 입력해주세요
+                </label>
+
+                <input 
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="아이디 입력"
+                    required
+                >
+
+            </div>
+
+
+
+
+            <!-- 이메일 -->
+            <div class="form-group">
+
+                <label for="email">
+                    이메일 주소를 입력해주세요
+                </label>
+
+                <input 
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="이메일 입력"
+                    required
+                >
+
+            </div>
+
+
+
+
+            <!-- 이름 -->
+            <div class="form-group">
+
+                <label for="name">
+                    성함을 입력해주세요
+                </label>
+
+                <input 
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="이름 입력"
+                    required
+                >
+
+            </div>
+
+
+
+
+            <!-- 생년월일 -->
+            <div class="form-group">
+
+                <label for="birth">
+                    생년월일을 입력해주세요
+                </label>
+
+                <input 
+                    type="date"
+                    id="birth"
+                    name="birth"
+                    required
+                >
+
+            </div>
+
+
+
+
+            <!-- 비밀번호 -->
+            <div class="form-group">
+
+                <label for="password">
+                    원하시는 비밀번호를 입력해주세요
+                </label>
+
+                <input 
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="비밀번호 입력"
+                    required
+                >
+
+            </div>
+
+
+
+
+            <!-- 비밀번호 확인 -->
+            <div class="form-group">
+
+                <label for="password-check">
+                    비밀번호를 한번 더 입력해주세요
+                </label>
+
+                <input 
+                    type="password"
+                    id="password-check"
+                    name="password-check"
+                    placeholder="비밀번호 확인"
+                    required
+                >
+
+            </div>
+
+
+
+
+            <!-- 완료 버튼 -->
+            <button 
+                type="submit"
+                class="btn btn-primary btn-block"
+            >
+                회원가입 완료
+            </button>
+
+
+
+        </form>
+
+
+    </section>
+
+
+</main>
+
+
+{% endblock %}
+
+
+
+
+{% block extra_js %}
+<script src="{% static 'js/signup.js' %}"></script>
+{% endblock %}
