@@ -31,16 +31,20 @@ class IsAnswerAuthor(BasePermission):
         return obj.author == request.user
 
 
-class IsAnswerAuthorForGuideData(BasePermission):
+class IsQuestionAuthorForGuideData(BasePermission):
     """
-    guide-data 조회는 '설명서 작성용으로 선택된 답변'의 작성자만 가능
-    (SAFE_METHODS 예외 없음, 선택 안 된 답변은 작성자 본인도 접근 불가)
+    설명서 등록용 답변 데이터는
+    해당 질문 작성자만 조회할 수 있다.
     """
 
-    message = "설명서 작성용으로 선택된 답변만 데이터를 조회할 수 있습니다."
+    message = "질문 작성자만 설명서 등록용 데이터를 조회할 수 있습니다."
 
     def has_object_permission(self, request, view, obj):
-        return obj.author == request.user and obj.is_accepted
+        return (
+            obj.question.author == request.user
+            and obj.is_accepted
+        )
+    
 
 class IsQuestionAuthorOfAnswer(BasePermission):
     """
