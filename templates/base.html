@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}똑디 - 똑똑한 디지털 설명서{% endblock %}</title>
+
+<!-- Google Material Symbols Rounded -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+<!-- 공통 리셋 + 디자인 시스템 -->
+<link rel="stylesheet" href="{% static 'css/reset.css' %}">
+<link rel="stylesheet" href="{% static 'css/common.css' %}">
+
+<!-- 페이지별 추가 CSS는 여기서 -->
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ============ 공통 네비게이션 ============ -->
+  <nav class="nav-bar">
+    <div class="nav-inner">
+
+      <a href="{% url 'home' %}" class="nav-btn {% if active_nav == 'home' %}is-active{% endif %}">
+        <span class="material-symbols-rounded">home</span> 검색하기
+      </a>
+
+      <a href="{% if user.is_authenticated %}{% url 'guides:create' %}{% else %}{% url 'accounts:login' %}?next={% url 'guides:create' %}{% endif %}"
+         class="nav-btn {% if active_nav == 'guide_write' %}is-active{% endif %}">
+        <span class="material-symbols-rounded">edit</span> 설명서 작성
+      </a>
+
+      <a href="{% url 'questions:list' %}" class="nav-btn {% if active_nav == 'question_list' %}is-active{% endif %}">
+        <span class="material-symbols-rounded">help</span> 질문 목록
+      </a>
+
+      <a href="{% if user.is_authenticated %}{% url 'mypage:storage' %}{% else %}{% url 'accounts:login' %}?next={% url 'mypage:storage' %}{% endif %}"
+         class="nav-btn {% if active_nav == 'storage' %}is-active{% endif %}">
+        <span class="material-symbols-rounded">bookmark</span> 나의 저장소
+      </a>
+
+      <a href="{% if user.is_authenticated %}{% url 'mypage:info' %}{% else %}{% url 'accounts:login' %}?next={% url 'mypage:info' %}{% endif %}"
+         class="nav-btn {% if active_nav == 'my_info' %}is-active{% endif %}">
+        <span class="material-symbols-rounded">person</span> 나의 정보
+      </a>
+
+      {% if user.is_authenticated %}
+        <form action="{% url 'accounts:logout' %}" method="post" style="margin-left:auto;">
+          {% csrf_token %}
+          <button type="submit" class="nav-btn nav-btn-exit">
+            <span class="material-symbols-rounded">logout</span> 로그아웃
+          </button>
+        </form>
+      {% else %}
+        <a href="{% url 'accounts:login' %}" class="nav-btn nav-btn-exit">
+          <span class="material-symbols-rounded">login</span> 로그인
+        </a>
+      {% endif %}
+
+    </div>
+  </nav>
+
+  <!-- ============ 페이지 콘텐츠 ============ -->
+  <main class="app-main">
+    {% block content %}{% endblock %}
+  </main>
+
+</div>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

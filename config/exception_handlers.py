@@ -15,10 +15,9 @@ def common_exception_handler(exc, context):
 
     body = {
         "success": False,
+        "data": detail,
         "message": message,
     }
-    if detail is not None:
-        body["data"] = detail
 
     response.data = body
     return response
