@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}질문 상세{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/question_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<main
+    class="question-detail-page"
+    data-question-id="{{ view.kwargs.pk }}"
+    data-current-user="{{ user.username }}"
+>
+    <section id="question-detail">
+        <p>질문을 불러오는 중입니다.</p>
+    </section>
+
+    <section id="answer-section">
+        <h2>답변</h2>
+        <div id="answer-list"></div>
+
+        <form id="answer-form">
+            <textarea
+                id="answer-content"
+                rows="6"
+                placeholder="답변을 입력하세요."
+                required
+            ></textarea>
+
+            <input
+                type="file"
+                id="answer-images"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+            >
+
+            <div id="answer-image-description-list"></div>
+
+            <button type="submit">답변 등록</button>
+        </form>
+    </section>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/question_detail.js' %}"></script>
+{% endblock %}

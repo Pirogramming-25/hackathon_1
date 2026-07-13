@@ -27,27 +27,41 @@
         <span class="material-symbols-rounded">home</span> 검색하기
       </a>
 
-      <a href="{% if user.is_authenticated %}/api/guides/{% else %}{% url 'login' %}?next=/api/guides/{% endif %}"
-         class="nav-btn {% if active_nav == 'guide_write' %}is-active{% endif %}">
-        <span class="material-symbols-rounded">edit</span> 설명서 작성
+      <a
+        href="#"
+        class="nav-btn {% if active_nav == 'guide_write' %}is-active{% endif %}"
+      >
+        <span class="material-symbols-rounded">edit</span>
+        설명서 작성
       </a>
 
-      <a href="/api/questions/" class="nav-btn {% if active_nav == 'question_list' %}is-active{% endif %}">
-        <span class="material-symbols-rounded">help</span> 질문 목록
+      <a
+        href="{% url 'question_page_list' %}"
+        class="nav-btn {% if active_nav == 'question_list' %}is-active{% endif %}"
+      >
+        <span class="material-symbols-rounded">help</span>
+        질문 목록
       </a>
 
-      <a href="{% if user.is_authenticated %}/api/users/me/questions/{% else %}{% url 'login' %}?next=/api/users/me/questions/{% endif %}"
-         class="nav-btn {% if active_nav == 'storage' %}is-active{% endif %}">
-        <span class="material-symbols-rounded">bookmark</span> 나의 저장소
+      <a
+        href="#"
+        class="nav-btn {% if active_nav == 'storage' %}is-active{% endif %}"
+      >
+        <span class="material-symbols-rounded">bookmark</span>
+          나의 저장소
       </a>
 
-      <a href="{% if user.is_authenticated %}{% url 'my_page' %}{% else %}{% url 'login' %}?next={% url 'my_page' %}{% endif %}"
-         class="nav-btn {% if active_nav == 'my_info' %}is-active{% endif %}">
-        <span class="material-symbols-rounded">person</span> 나의 정보
+      <a
+        href="{% if user.is_authenticated %}{% url 'my_info' %}{% else %}{% url 'login' %}?next={% url 'my_info' %}{% endif %}"
+        class="nav-btn {% if active_nav == 'my_info' %}is-active{% endif %}"
+      >
+        <span class="material-symbols-rounded">person</span>
+        나의 정보
       </a>
+
 
       {% if user.is_authenticated %}
-        <form action="{% url 'accounts:logout' %}" method="post" style="margin-left:auto;">
+        <form action="/api/auth/logout/" method="post" style="margin-left:auto;">
           {% csrf_token %}
           <button type="submit" class="nav-btn nav-btn-exit">
             <span class="material-symbols-rounded">logout</span> 로그아웃

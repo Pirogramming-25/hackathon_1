@@ -34,6 +34,26 @@ def index(request):
 
 
 urlpatterns = [
+
+    path(
+        "questions/",
+        TemplateView.as_view(
+            template_name="question_list.html",
+            extra_context={"active_nav": "question_list"},
+        ),
+        name="question_page_list",
+    ),
+    path(
+        "questions/create/",
+        TemplateView.as_view(template_name="question_create.html"),
+        name="question_create",
+    ),
+    path(
+        "questions/<int:pk>/",
+        TemplateView.as_view(template_name="question_detail.html"),
+        name="question_detail",
+    ),
+
     path("", TemplateView.as_view(template_name="home.html"), name="home"),
     path("login/", TemplateView.as_view(template_name="login.html"), name="login"),
     path("signup/", TemplateView.as_view(template_name="signup.html"), name="signup"),

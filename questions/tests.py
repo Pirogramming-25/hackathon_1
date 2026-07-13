@@ -568,15 +568,34 @@ class AnswerAPITests(APITestCase):
 
 class GuideDataAPITests(APITestCase):
     def setUp(self):
+        # 질문 작성자
+        self.question_author = User.objects.create_user(
+            username="q_author",
+            email="q_author@test.com",
+            password="pass1234",
+        )
+
+        # 답변 작성자
         self.answer_author = User.objects.create_user(
-            username="a_author", email="a_author2@test.com", password="pass1234"
+            username="a_author",
+            email="a_author@test.com",
+            password="pass1234",
         )
+
+        # 관계없는 사용자
         self.other = User.objects.create_user(
-            username="other", email="other3@test.com", password="pass1234"
+            username="other",
+            email="other@test.com",
+            password="pass1234",
         )
+
         self.question = Question.objects.create(
-            author=self.answer_author, title="t", content="c", category="MEDICAL"
+            author=self.question_author,
+            title="t",
+            content="c",
+            category="MEDICAL",
         )
+
         self.answer = Answer.objects.create(
             question=self.question,
             author=self.answer_author,
@@ -585,41 +604,119 @@ class GuideDataAPITests(APITestCase):
         )
 
         AnswerImage.objects.create(
-            answer=self.answer, image=make_image("second.png"), display_order=2
-        )
-        AnswerImage.objects.create(
-            answer=self.answer, image=make_image("first.png"), display_order=1
+            answer=self.answer,
+            image=make_image("second.png"),
+            display_order=2,
         )
 
-    def test_author_can_fetch_guide_data(self):
-        self.client.force_authenticate(user=self.answer_author)
-        response = self.client.get(f"/api/answers/{self.answer.id}/guide-data/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        AnswerImage.objects.create(
+            answer=self.answer,
+            image=make_image("first.png"),
+            display_order=1,
+        )
+
+    def test_question_author_can_fetch_guide_data(self):
+        self.client.force_authenticate(
+            user=self.question_author
+        )
+
+        response = self.client.get(
+            f"/api/answers/{self.answer.id}/guide-data/"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+        )
         self.assertTrue(response.data["success"])
 
+    def test_answer_author_cannot_fetch_guide_data(self):
+        self.client.force_authenticate(
+            user=self.answer_author
+        )
+
+        response = self.client.get(
+            f"/api/answers/{self.answer.id}/guide-data/"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+
     def test_other_user_cannot_fetch_guide_data(self):
-        self.client.force_authenticate(user=self.other)
-        response = self.client.get(f"/api/answers/{self.answer.id}/guide-data/")
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.client.force_authenticate(
+            user=self.other
+        )
+
+        response = self.client.get(
+            f"/api/answers/{self.answer.id}/guide-data/"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
 
     def test_category_matches_question_category(self):
-        self.client.force_authenticate(user=self.answer_author)
-        response = self.client.get(f"/api/answers/{self.answer.id}/guide-data/")
-        self.assertEqual(response.data["data"]["category"], "MEDICAL")
+        self.client.force_authenticate(
+            user=self.question_author
+        )
+
+        response = self.client.get(
+            f"/api/answers/{self.answer.id}/guide-data/"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+        )
+        self.assertEqual(
+            response.data["data"]["category"],
+            "MEDICAL",
+        )
 
     def test_images_ordered_by_display_order(self):
-        self.client.force_authenticate(user=self.answer_author)
-        response = self.client.get(f"/api/answers/{self.answer.id}/guide-data/")
-        orders = [img["display_order"] for img in response.data["data"]["images"]]
+        self.client.force_authenticate(
+            user=self.question_author
+        )
+
+        response = self.client.get(
+            f"/api/answers/{self.answer.id}/guide-data/"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+        )
+
+        orders = [
+            image["display_order"]
+            for image in response.data["data"]["images"]
+        ]
+
         self.assertEqual(orders, [1, 2])
 
     def test_guide_data_blocked_for_unaccepted_answer(self):
         unaccepted_answer = Answer.objects.create(
-            question=self.question, author=self.answer_author, content="미선택 답변"
+            question=self.question,
+            author=self.answer_author,
+            content="미선택 답변",
+            is_accepted=False,
         )
-        self.client.force_authenticate(user=self.answer_author)
-        response = self.client.get(f"/api/answers/{unaccepted_answer.id}/guide-data/")
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)    
+
+        self.client.force_authenticate(
+            user=self.question_author
+        )
+
+        response = self.client.get(
+            f"/api/answers/{unaccepted_answer.id}/guide-data/"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
 
 class MyPageAPITests(APITestCase):
     def setUp(self):

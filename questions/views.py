@@ -9,8 +9,8 @@ from django.db import transaction
 from .models import Answer, AnswerImage, Question, QuestionImage
 from .permissions import (
     IsAnswerAuthor,
-    IsAnswerAuthorForGuideData,
     IsQuestionAuthor,
+    IsQuestionAuthorForGuideData,
     IsQuestionAuthorOfAnswer,
 )
 from .serializers import (
@@ -225,7 +225,7 @@ class AnswerViewSet(
         detail=True,
         methods=["get"],
         url_path="guide-data",
-        permission_classes=[IsAuthenticated, IsAnswerAuthorForGuideData],
+        permission_classes=[IsAuthenticated, IsQuestionAuthorForGuideData],
     )
     def guide_data(self, request, pk=None):
         answer = self.get_object()

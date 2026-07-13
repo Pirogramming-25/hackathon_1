@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}질문 목록{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/question_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="question-page">
+    <section class="question-header">
+        <div>
+            <h1>질문 목록</h1>
+            <p>디지털 사용 중 궁금한 내용을 확인하세요.</p>
+        </div>
+
+        <a href="{% url 'question_create' %}" class="question-create-link">
+            질문 등록
+        </a>
+    </section>
+
+    <section id="question-list">
+        <p>질문을 불러오는 중입니다.</p>
+    </section>
+
+    <div id="pagination"></div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/question_list.js' %}"></script>
+{% endblock %}
