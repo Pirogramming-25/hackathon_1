@@ -1,0 +1,261 @@
+.my-save-page{
+
+    width:1000px;
+    margin:60px auto 80px;
+
+}
+
+
+/* ===========================
+   Title
+=========================== */
+
+.page-title{
+
+    text-align:center;
+    margin-bottom:60px;
+
+}
+
+.page-title h1{
+
+    font-size:44px;
+    font-weight:700;
+    color:#202124;
+    margin-bottom:14px;
+
+}
+
+.page-title p{
+
+    font-size:20px;
+    color:#6B7280;
+    line-height:1.7;
+
+}
+
+
+/* ===========================
+   Menu
+=========================== */
+
+.save-menu{
+
+    display:flex;
+    flex-direction:column;
+    gap:28px;
+
+}
+
+
+/* ===========================
+   Card
+=========================== */
+
+.save-card{
+
+    display:flex;
+    align-items:center;
+
+    gap:28px;
+
+    padding:32px;
+
+    background:#ffffff;
+
+    border-radius:28px;
+
+    text-decoration:none;
+
+    color:#202124;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+    transition:.25s;
+
+}
+
+.save-card:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:0 18px 40px rgba(79,142,247,.16);
+
+}
+
+
+/* ===========================
+   Icon
+=========================== */
+
+.save-icon{
+
+    width:82px;
+    height:82px;
+
+    border-radius:22px;
+
+    background:#EDF4FF;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    flex-shrink:0;
+
+}
+
+.save-icon span{
+
+    font-size:42px;
+    color:#4F8EF7;
+
+}
+
+
+/* ===========================
+   Text
+=========================== */
+
+.save-content{
+
+    flex:1;
+
+}
+
+.save-content h2{
+
+    font-size:28px;
+    font-weight:700;
+    margin-bottom:10px;
+
+}
+
+.save-content p{
+
+    font-size:18px;
+    color:#6B7280;
+    line-height:1.7;
+
+}
+
+
+/* ===========================
+   Arrow
+=========================== */
+
+.save-arrow{
+
+    width:52px;
+    height:52px;
+
+    border-radius:50%;
+
+    background:#F5F7FA;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    transition:.2s;
+
+}
+
+.save-arrow span{
+
+    font-size:30px;
+    color:#4F8EF7;
+
+}
+
+.save-card:hover .save-arrow{
+
+    background:#4F8EF7;
+
+}
+
+.save-card:hover .save-arrow span{
+
+    color:white;
+
+}
+
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media(max-width:1100px){
+
+    .my-save-page{
+
+        width:92%;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .save-card{
+
+        padding:24px;
+        gap:20px;
+
+    }
+
+    .save-icon{
+
+        width:70px;
+        height:70px;
+
+    }
+
+    .save-icon span{
+
+        font-size:34px;
+
+    }
+
+    .save-content h2{
+
+        font-size:24px;
+
+    }
+
+    .save-content p{
+
+        font-size:17px;
+
+    }
+
+}
+
+@media(max-width:600px){
+
+    .page-title h1{
+
+        font-size:34px;
+
+    }
+
+    .page-title p{
+
+        font-size:17px;
+
+    }
+
+    .save-card{
+
+        flex-direction:column;
+        align-items:flex-start;
+
+    }
+
+    .save-arrow{
+
+        align-self:flex-end;
+
+    }
+
+}
