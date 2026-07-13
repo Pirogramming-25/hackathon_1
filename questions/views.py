@@ -1,5 +1,3 @@
-# backend/questions/views.py
-
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, mixins, status, viewsets
 from rest_framework.decorators import action

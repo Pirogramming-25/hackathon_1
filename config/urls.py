@@ -18,7 +18,7 @@ def index(request):
     return JsonResponse(
         {
             "success": True,
-            "message": "Hackathon backend server is running.",
+            "message": "Hackathon Django server is running.",
             "endpoints": {
                 "admin": "/admin/",
                 "health": "/api/health/",
