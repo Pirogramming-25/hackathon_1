@@ -1,10 +1,13 @@
-
+import os
+import tempfile
 from io import BytesIO
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db import IntegrityError
-from django.test import TestCase
+from django.db import IntegrityError, transaction
+from django.test import TestCase, override_settings
+
 from PIL import Image
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -83,6 +86,65 @@ class QuestionModelTests(TestCase):
                 question=question, image=make_image("b.png"), display_order=1
             )
 
+class ImageFileDeleteTests(TestCase):
+    def setUp(self):
+        self.temp_media_root = tempfile.mkdtemp()
+        self.override = override_settings(
+            MEDIA_ROOT=self.temp_media_root
+        )
+        self.override.enable()
+
+        self.user = User.objects.create_user(
+            username="image_user",
+            email="image_user@test.com",
+            password="pass1234",
+        )
+
+        self.question = Question.objects.create(
+            author=self.user,
+            title="이미지 삭제 테스트",
+            content="내용",
+            category="LIFE",
+        )
+
+    def tearDown(self):
+        self.override.disable()
+
+    def test_question_image_file_deleted_with_database_record(self):
+        question_image = QuestionImage.objects.create(
+            question=self.question,
+            image=make_image("question-delete.png"),
+            display_order=1,
+        )
+
+        image_path = question_image.image.path
+        self.assertTrue(os.path.exists(image_path))
+
+        with self.captureOnCommitCallbacks(execute=True):
+            question_image.delete()
+
+        self.assertFalse(os.path.exists(image_path))
+
+    def test_answer_image_file_deleted_with_database_record(self):
+        answer = Answer.objects.create(
+            question=self.question,
+            author=self.user,
+            content="답변",
+        )
+
+        answer_image = AnswerImage.objects.create(
+            answer=answer,
+            image=make_image("answer-delete.png"),
+            display_order=1,
+        )
+
+        image_path = answer_image.image.path
+        self.assertTrue(os.path.exists(image_path))
+
+        with self.captureOnCommitCallbacks(execute=True):
+            answer_image.delete()
+
+        self.assertFalse(os.path.exists(image_path))
 
 # =========================================================
 # 질문 API 테스트
@@ -118,6 +180,33 @@ class QuestionAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(response.data["success"])
         self.assertEqual(response.data["data"]["title"], "새 질문")
+
+    def test_create_question_rolls_back_when_image_save_fails(self):
+        self.client.force_authenticate(user=self.author)
+        question_count_before = Question.objects.count()
+
+        payload = {
+            "title": "롤백 테스트 질문",
+            "content": "내용",
+            "category": "LIFE",
+            "images": [make_image("rollback-question.png")],
+        }
+
+        with patch(
+            "questions.serializers.QuestionCreateUpdateSerializer._save_images",
+        side_effect=RuntimeError("이미지 저장 실패"),
+        ):
+            with self.assertRaises(RuntimeError):
+                self.client.post(
+                    "/api/questions/",
+                    payload,
+                    format="multipart",
+                )
+
+        self.assertEqual(
+            Question.objects.count(),
+            question_count_before,
+        )
 
     def test_create_question_with_6_images_fails(self):
         self.client.force_authenticate(user=self.author)
@@ -218,6 +307,7 @@ class QuestionAPITests(APITestCase):
         self.assertEqual(self.question.images.count(), 1)
 
 
+
 # =========================================================
 # 답변 API 테스트
 # =========================================================
@@ -247,6 +337,31 @@ class AnswerAPITests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(response.data["success"])
+
+    def test_create_answer_rolls_back_when_image_save_fails(self):
+        self.client.force_authenticate(user=self.other)
+        answer_count_before = Answer.objects.count()
+
+        payload = {
+            "content": "롤백 테스트 답변",
+            "images": [make_image("rollback-answer.png")],
+        }
+
+        with patch(
+            "questions.serializers.AnswerCreateUpdateSerializer._save_images",
+            side_effect=RuntimeError("이미지 저장 실패"),
+        ):
+            with self.assertRaises(RuntimeError):
+                self.client.post(
+                    f"/api/questions/{self.question.id}/answers/",
+                    payload,
+                    format="multipart",
+                )
+
+        self.assertEqual(
+            Answer.objects.count(),
+            answer_count_before,
+        )
 
     def test_create_answer_with_5_images_fails(self):
         self.client.force_authenticate(user=self.other)
@@ -376,6 +491,21 @@ class AnswerAPITests(APITestCase):
         second_answer.refresh_from_db()
         self.assertFalse(self.answer.is_accepted)
         self.assertTrue(second_answer.is_accepted)    
+
+    def test_database_rejects_multiple_accepted_answers_for_same_question(self):
+        # 첫 번째 답변을 선택 상태로 설정
+        self.answer.is_accepted = True
+        self.answer.save(update_fields=["is_accepted"])
+
+        # 같은 질문에 선택된 답변을 하나 더 만들면 DB에서 막아야 함
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                Answer.objects.create(
+                    question=self.question,
+                    author=self.other,
+                    content="두 번째 선택 답변",
+                    is_accepted=True,
+                )    
     
     def test_update_answer_replaces_images(self):
         self.client.force_authenticate(user=self.answer_author)
