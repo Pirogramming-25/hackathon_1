@@ -74,7 +74,7 @@ class FamilyAPITestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["data"], [])
 
-    def test_create_family_request(self):
+    def test_createe_family_request(self):
         self.login()
 
         response = self.client.post(
@@ -84,14 +84,14 @@ class FamilyAPITestCase(TestCase):
         )
         relation = FamilyRelation.objects.get()
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_201_createED)
         self.assertTrue(response.data["success"])
         self.assertEqual(relation.user1_id, min(self.user.pk, self.target.pk))
         self.assertEqual(relation.user2_id, max(self.user.pk, self.target.pk))
         self.assertEqual(relation.requester, self.user)
         self.assertEqual(relation.status, FamilyRelation.Status.PENDING)
 
-    def test_create_family_request_rejects_self(self):
+    def test_createe_family_request_rejects_self(self):
         self.login()
 
         response = self.client.post(
@@ -104,7 +104,7 @@ class FamilyAPITestCase(TestCase):
         self.assertFalse(response.data["success"])
         self.assertEqual(FamilyRelation.objects.count(), 0)
 
-    def test_create_family_request_rejects_duplicate_pending(self):
+    def test_createe_family_request_rejects_duplicate_pending(self):
         self.create_relation()
         self.login()
 
@@ -117,7 +117,7 @@ class FamilyAPITestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(FamilyRelation.objects.count(), 1)
 
-    def test_create_family_request_rejects_reverse_duplicate_pending(self):
+    def test_createe_family_request_rejects_reverse_duplicate_pending(self):
         self.create_relation(requester=self.target, target=self.user)
         self.login()
 
@@ -130,7 +130,7 @@ class FamilyAPITestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(FamilyRelation.objects.count(), 1)
 
-    def test_create_family_request_rejects_duplicate_accepted(self):
+    def test_createe_family_request_rejects_duplicate_accepted(self):
         self.create_relation(relation_status=FamilyRelation.Status.ACCEPTED)
         self.login()
 
@@ -143,7 +143,7 @@ class FamilyAPITestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(FamilyRelation.objects.count(), 1)
 
-    def test_create_family_request_reuses_rejected_relation(self):
+    def test_createe_family_request_reuses_rejected_relation(self):
         relation = self.create_relation(
             requester=self.target,
             target=self.user,

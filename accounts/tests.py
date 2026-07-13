@@ -62,7 +62,7 @@ class AuthAPITestCase(TestCase):
             format="json",
         )
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_201_createED)
         self.assertTrue(response.data["success"])
         self.assertTrue(User.objects.filter(username="newuser").exists())
         self.assertNotIn("password", response.data["data"])

@@ -92,7 +92,7 @@ class SignupView(APIView):
             True,
             "회원가입이 완료되었습니다.",
             UserSerializer(user).data,
-            status.HTTP_201_CREATED,
+            status.HTTP_201_createED,
         )
 
 

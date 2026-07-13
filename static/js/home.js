@@ -21,10 +21,10 @@ document.addEventListener('DOMContentLoaded', function () {
   if (quickAskBtn) {
     quickAskBtn.addEventListener('click', function () {
       if (window.DDOKDI_IS_AUTHENTICATED) {
-        window.location.href = window.DDOKDI_QUESTION_CREATE_URL;
+        window.location.href = window.DDOKDI_QUESTION_createE_URL;
       } else {
         window.location.href =
-          window.DDOKDI_LOGIN_URL + '?next=' + encodeURIComponent(window.DDOKDI_QUESTION_CREATE_URL);
+          window.DDOKDI_LOGIN_URL + '?next=' + encodeURIComponent(window.DDOKDI_QUESTION_createE_URL);
       }
     });
   }

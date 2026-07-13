@@ -1,4 +1,4 @@
-/* static/js/guid_list.js */
+/* static/js/guide_list.js */
 
 document.addEventListener('DOMContentLoaded', () => {
     

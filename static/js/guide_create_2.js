@@ -1,4 +1,4 @@
-/* static/js/guid_create_2.js */
+/* static/js/guide_createe_2.js */
 
 document.addEventListener('DOMContentLoaded', function() {
     const canvasContainer = document.getElementById('canvasContainer');

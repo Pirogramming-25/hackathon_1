@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.BigAutoField(
-                        auto_created=True,
+                        auto_createed=True,
                         primary_key=True,
                         serialize=False,
                         verbose_name="ID",

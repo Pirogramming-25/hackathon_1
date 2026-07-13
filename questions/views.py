@@ -113,7 +113,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
             return error_response("입력값을 확인해주세요.", data=serializer.errors)
         question = serializer.save()
         result = QuestionDetailSerializer(question, context={"request": request}).data
-        return success_response(result, "질문이 등록되었습니다.", status.HTTP_201_CREATED)
+        return success_response(result, "질문이 등록되었습니다.", status.HTTP_201_createED)
 
     # ---------- 상세 / 수정 / 삭제 ----------
 
@@ -177,7 +177,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
         answer = serializer.save()
 
         result = AnswerSerializer(answer, context={"request": request}).data
-        return success_response(result, "답변이 등록되었습니다.", status.HTTP_201_CREATED)
+        return success_response(result, "답변이 등록되었습니다.", status.HTTP_201_createED)
 
 
 class AnswerViewSet(
