@@ -25,13 +25,13 @@ def validate_image_file(image):
 class QuestionImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuestionImage
-        fields = ["id", "image", "display_order"]
+        fields = ["id", "image", "description", "display_order"]
 
 
 class AnswerImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = AnswerImage
-        fields = ["id", "image", "display_order"]
+        fields = ["id", "image", "description", "display_order"]
 
 
 # ---------- 답변 (질문 상세에 중첩) ----------
@@ -115,44 +115,62 @@ class QuestionCreateUpdateSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False,
     )
+    image_descriptions = serializers.ListField(
+        child=serializers.CharField(allow_blank=True, max_length=200),
+        write_only=True,
+        required=False,
+    )
 
     class Meta:
         model = Question
-        fields = ["title", "content", "category", "images"]
+        fields = ["title", "content", "category", "images", "image_descriptions"]
 
-    def validate_images(self, value):
-        if len(value) > 5:
+    def validate(self, attrs):
+        images = attrs.get("images", [])
+        descriptions = attrs.get("image_descriptions", [])
+
+        if len(images) > 5:
             raise serializers.ValidationError(
-                "이미지는 최대 5장까지 등록할 수 있습니다."
+                {"images": "이미지는 최대 5장까지 등록할 수 있습니다."}
             )
-        for image in value:
+        for image in images:
             validate_image_file(image)
-        return value
+
+        if descriptions and len(descriptions) != len(images):
+            raise serializers.ValidationError(
+                {"image_descriptions": "이미지 개수와 설명 개수가 일치해야 합니다."}
+            )
+        return attrs
 
     def create(self, validated_data):
         images = validated_data.pop("images", [])
+        descriptions = validated_data.pop("image_descriptions", [])
         author = self.context["request"].user
         question = Question.objects.create(author=author, **validated_data)
-        self._save_images(question, images)
+        self._save_images(question, images, descriptions)
         return question
 
     def update(self, instance, validated_data):
         images = validated_data.pop("images", None)
+        descriptions = validated_data.pop("image_descriptions", [])
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
 
-        # 방식 A: 새 이미지가 오면 기존 이미지 전체 삭제 후 재저장
         if images is not None:
             instance.images.all().delete()
-            self._save_images(instance, images)
+            self._save_images(instance, images, descriptions)
 
         return instance
 
-    def _save_images(self, question, images):
+    def _save_images(self, question, images, descriptions):
         for order, image in enumerate(images, start=1):
+            description = descriptions[order - 1] if descriptions else ""
             QuestionImage.objects.create(
-                question=question, image=image, display_order=order
+                question=question,
+                image=image,
+                description=description,
+                display_order=order,
             )
 
 
@@ -172,48 +190,66 @@ class AnswerCreateUpdateSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False,
     )
+    image_descriptions = serializers.ListField(
+        child=serializers.CharField(allow_blank=True, max_length=200),
+        write_only=True,
+        required=False,
+    )
 
     class Meta:
         model = Answer
-        fields = ["content", "images"]
+        fields = ["content", "images", "image_descriptions"]
 
-    def validate_images(self, value):
-        if len(value) > 4:
+    def validate(self, attrs):
+        images = attrs.get("images", [])
+        descriptions = attrs.get("image_descriptions", [])
+
+        if len(images) > 4:
             raise serializers.ValidationError(
-                "이미지는 최대 4장까지 등록할 수 있습니다."
+                {"images": "이미지는 최대 4장까지 등록할 수 있습니다."}
             )
-        for image in value:
+        for image in images:
             validate_image_file(image)
-        return value
+
+        if descriptions and len(descriptions) != len(images):
+            raise serializers.ValidationError(
+                {"image_descriptions": "이미지 개수와 설명 개수가 일치해야 합니다."}
+            )
+        return attrs
 
     def create(self, validated_data):
         images = validated_data.pop("images", [])
+        descriptions = validated_data.pop("image_descriptions", [])
         author = self.context["request"].user
         question = self.context["question"]
         answer = Answer.objects.create(
             author=author, question=question, **validated_data
         )
-        self._save_images(answer, images)
+        self._save_images(answer, images, descriptions)
         return answer
 
     def update(self, instance, validated_data):
         images = validated_data.pop("images", None)
+        descriptions = validated_data.pop("image_descriptions", [])
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
 
         if images is not None:
             instance.images.all().delete()
-            self._save_images(instance, images)
+            self._save_images(instance, images, descriptions)
 
         return instance
 
-    def _save_images(self, answer, images):
+    def _save_images(self, answer, images, descriptions):
         for order, image in enumerate(images, start=1):
+            description = descriptions[order - 1] if descriptions else ""
             AnswerImage.objects.create(
-                answer=answer, image=image, display_order=order
+                answer=answer,
+                image=image,
+                description=description,
+                display_order=order,
             )
-
 
 # ---------- 답변 → 설명서 작성용 데이터 ----------
 
@@ -222,7 +258,7 @@ class GuideImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AnswerImage
-        fields = ["image_url", "display_order"]
+        fields = ["image_url", "description", "display_order"]
 
     def get_image_url(self, obj):
         request = self.context.get("request")
@@ -238,3 +274,17 @@ class GuideDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
         fields = ["answer_id", "category", "content", "images"]
+
+class MyAnswerListSerializer(serializers.ModelSerializer):
+    question_id = serializers.IntegerField(source="question.id", read_only=True)
+    question_title = serializers.CharField(source="question.title", read_only=True)
+
+    class Meta:
+        model = Answer
+        fields = [
+            "id",
+            "question_id",
+            "question_title",
+            "content",
+            "created_at",
+        ]

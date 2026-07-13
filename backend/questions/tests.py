@@ -254,6 +254,33 @@ class AnswerAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertFalse(Answer.objects.filter(id=self.answer.id).exists())
 
+    def test_answer_with_image_descriptions_saved_correctly(self):
+        self.client.force_authenticate(user=self.other)
+        payload = {
+            "content": "새 답변",
+            "images": [make_image("a.png"), make_image("b.png")],
+            "image_descriptions": ["1단계 설명", "2단계 설명"],
+        }
+        response = self.client.post(
+            f"/api/questions/{self.question.id}/answers/", payload, format="multipart"
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        images = response.data["data"]["images"]
+        self.assertEqual(images[0]["description"], "1단계 설명")
+        self.assertEqual(images[1]["description"], "2단계 설명")
+
+    def test_answer_with_mismatched_image_description_count_fails(self):
+        self.client.force_authenticate(user=self.other)
+        payload = {
+            "content": "새 답변",
+            "images": [make_image("a.png"), make_image("b.png")],
+            "image_descriptions": ["설명 1개만"],
+        }
+        response = self.client.post(
+            f"/api/questions/{self.question.id}/answers/", payload, format="multipart"
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
 
 # =========================================================
 # Guide Data 테스트
@@ -301,3 +328,38 @@ class GuideDataAPITests(APITestCase):
         response = self.client.get(f"/api/answers/{self.answer.id}/guide-data/")
         orders = [img["display_order"] for img in response.data["data"]["images"]]
         self.assertEqual(orders, [1, 2])
+
+class MyPageAPITests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="me", email="me@test.com", password="pass1234"
+        )
+        self.other = User.objects.create_user(
+            username="other4", email="other4@test.com", password="pass1234"
+        )
+        self.my_question = Question.objects.create(
+            author=self.user, title="내 질문", content="c", category="LIFE"
+        )
+        self.other_question = Question.objects.create(
+            author=self.other, title="남 질문", content="c", category="LIFE"
+        )
+        self.my_answer = Answer.objects.create(
+            question=self.other_question, author=self.user, content="내 답변"
+        )
+        Answer.objects.create(
+            question=self.my_question, author=self.other, content="남 답변"
+        )
+
+    def test_my_question_list_only_shows_own_questions(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get("/api/users/me/questions/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        titles = [q["title"] for q in response.data["data"]["results"]]
+        self.assertEqual(titles, ["내 질문"])
+
+    def test_my_answer_list_only_shows_own_answers(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get("/api/users/me/answers/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        contents = [a["content"] for a in response.data["data"]["results"]]
+        self.assertEqual(contents, ["내 답변"])

@@ -44,6 +44,7 @@ class QuestionImage(models.Model):
         related_name="images",
     )
     image = models.ImageField(upload_to="questions/")
+    description = models.CharField(max_length=200, blank=True)
     display_order = models.PositiveSmallIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -86,6 +87,7 @@ class AnswerImage(models.Model):
         related_name="images",
     )
     image = models.ImageField(upload_to="answers/")
+    description = models.CharField(max_length=200, blank=True)
     display_order = models.PositiveSmallIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 

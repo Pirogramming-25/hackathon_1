@@ -1,7 +1,7 @@
 # backend/questions/views.py
 
 from django.shortcuts import get_object_or_404
-from rest_framework import mixins, status, viewsets
+from rest_framework import generics, mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -11,6 +11,7 @@ from .permissions import IsAnswerAuthor, IsAnswerAuthorForGuideData, IsQuestionA
 from .serializers import (
     AnswerCreateUpdateSerializer,
     GuideDataSerializer,
+    MyAnswerListSerializer,
     QuestionCreateUpdateSerializer,
     QuestionDetailSerializer,
     QuestionListSerializer,
@@ -174,3 +175,32 @@ class AnswerViewSet(
         answer = self.get_object()
         serializer = GuideDataSerializer(answer, context={"request": request})
         return success_response(serializer.data, "설명서 작성용 데이터를 조회했습니다.")
+    
+class MyQuestionListView(generics.ListAPIView):
+    serializer_class = QuestionListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Question.objects.filter(author=self.request.user).order_by("-created_at")
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True, context={"request": request})
+        paginated_data = self.get_paginated_response(serializer.data).data
+        return success_response(paginated_data, "내가 등록한 질문 목록을 조회했습니다.")
+
+
+class MyAnswerListView(generics.ListAPIView):
+    serializer_class = MyAnswerListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Answer.objects.filter(author=self.request.user).order_by("-created_at")
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True, context={"request": request})
+        paginated_data = self.get_paginated_response(serializer.data).data
+        return success_response(paginated_data, "내가 작성한 답변 목록을 조회했습니다.")
