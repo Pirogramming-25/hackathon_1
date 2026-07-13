@@ -1,151 +1,93 @@
-* {
-    box-sizing: border-box;
-}
+/* =====================================
+   똑디 나의 정보 페이지
+   static/css/myinfo.css
+===================================== */
 
 
-body {
+/* =====================
+   전체 레이아웃
+===================== */
 
-    margin:0;
+.myinfo-page {
 
-    font-family: "Pretendard", sans-serif;
+    min-height: calc(100vh - 92px);
 
-    color:#222;
+    max-width: 1200px;
 
-    background:white;
+    margin: 0 auto;
 
-}
+    padding: 80px 24px;
 
+    display: flex;
 
+    align-items: center;
 
-/* 상단 메뉴 */
-
-.navbar {
-
-    height:110px;
-
-    background:#eeeeee;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    gap:18px;
+    gap: 100px;
 
 }
 
 
 
-.nav-item {
-
-    width:205px;
-
-    height:65px;
-
-    background:#5fa8f5;
-
-    border-radius:20px;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    gap:10px;
-
-    color:white;
-
-    font-size:26px;
-
-    font-weight:700;
-
-    text-decoration:none;
-
-    box-shadow:0 4px 10px rgba(0,0,0,0.15);
-
-}
-
-
-.nav-item.active {
-
-    background:#2f80ed;
-
-}
-
-
-
-
-
-/* 전체 */
-
-.container {
-
-    display:flex;
-
-    max-width:1200px;
-
-    margin:100px auto;
-
-    gap:150px;
-
-}
-
-
-
-/* 왼쪽 제목 */
+/* =====================
+   왼쪽 소개 영역
+===================== */
 
 .title-box {
 
-    width:400px;
-
-    display:flex;
-
-    flex-direction:column;
-
-    justify-content:center;
+    flex: 1;
 
 }
+
 
 
 .title-box h1 {
 
-    font-size:45px;
-
-    line-height:1.6;
-
-    font-weight:700;
+    margin-bottom: 30px;
 
 }
+
 
 
 .title-box p {
 
-    font-size:22px;
-
-    color:#555;
-
-    line-height:1.6;
+    line-height: 1.6;
 
 }
 
 
 
 
-/* 오른쪽 */
+/* =====================
+   정보 수정 카드
+===================== */
 
 .info-form {
 
-    width:520px;
+    width: 560px;
+
+    padding: 45px;
 
 }
 
 
 
+
+
+/* =====================
+   정보 한 줄
+===================== */
+
 .info-row {
 
-    margin-bottom:35px;
+    margin-bottom: 32px;
+
+}
+
+
+
+.info-row:last-child {
+
+    margin-bottom: 0;
 
 }
 
@@ -153,26 +95,30 @@ body {
 
 .info-row label {
 
-    display:block;
+    display: block;
 
-    font-size:24px;
+    margin-bottom: 12px;
 
-    font-weight:600;
+    font-size: var(--font-body);
 
-    margin-bottom:12px;
+    font-weight: 700;
 
 }
 
 
 
 
+/* =====================
+   입력 영역
+===================== */
+
 .input-area {
 
-    display:flex;
+    display: flex;
 
-    align-items:center;
+    align-items: center;
 
-    gap:35px;
+    gap: 20px;
 
 }
 
@@ -181,60 +127,117 @@ body {
 .input-area input {
 
 
-    width:350px;
-
-    height:60px;
-
-    border:none;
-
-    border-radius:18px;
-
-    background:#e5e7eb;
-
-    font-size:22px;
-
-    padding:0 20px;
-
-}
+    flex: 1;
 
 
-
-.input-area button {
-
-
-    width:110px;
-
-    height:55px;
+    height: 60px;
 
 
-    border:none;
-
-    border-radius:18px;
+    border-radius: var(--radius-md);
 
 
-    background:#3478db;
+    border: 1px solid var(--color-border);
 
 
-    color:white;
+    background-color: var(--color-bg-soft);
 
 
-    font-size:22px;
+    padding: 0 20px;
 
 
-    font-weight:700;
+    font-size: var(--font-body);
 
 
-    cursor:pointer;
-
-
-    box-shadow:0 4px 8px rgba(0,0,0,0.15);
+    color: var(--color-text);
 
 }
 
 
 
-.input-area button:hover {
+.input-area input:disabled {
 
-    background:#2463be;
+    cursor: not-allowed;
+
+    color: var(--color-text-sub);
+
+}
+
+
+
+.input-area input:not(:disabled) {
+
+
+    background-color: var(--color-white);
+
+
+    border-color: var(--color-primary);
+
+
+}
+
+
+
+
+
+/* =====================
+   수정 버튼
+===================== */
+
+.edit-btn {
+
+    width: 110px;
+
+    flex-shrink: 0;
+
+}
+
+
+
+
+
+/* =====================
+   반응형
+===================== */
+
+@media (max-width: 900px) {
+
+
+    .myinfo-page {
+
+        flex-direction: column;
+
+        gap: 40px;
+
+        padding-top: 40px;
+
+    }
+
+
+
+    .info-form {
+
+        width: 100%;
+
+        padding: 32px 24px;
+
+    }
+
+
+
+    .input-area {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+    }
+
+
+
+    .edit-btn {
+
+        width: 100%;
+
+    }
 
 }

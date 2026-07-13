@@ -1,176 +1,125 @@
-body {
-
-    font-family: "Pretendard", sans-serif;
-
-    background-color: #f8fbff;
-
-    color: #222;
-
-}
+/* =====================================
+   똑디 회원가입 페이지
+   static/css/signup.css
+===================================== */
 
 
-
-/* =================
-    Header
-================= */
-
-
-header{
-
-    background:#f5f5f5;
-    padding:25px 0;
-}
-
-.nav{
-
-    display:flex;
-    justify-content:center;
-    gap:20px;
-}
-
-.nav a{
-
-    text-decoration:none;
-
-    background:#66a9ff;
-
-    color:white;
-
-    padding:18px 28px;
-
-    border-radius:18px;
-
-    font-size:22px;
-
-    font-weight:bold;
-}
-
-
-
-/* =================
-    Main
-================= */
-
+/* =====================
+   회원가입 전체
+===================== */
 
 .signup-page {
 
-
-    min-height: calc(100vh - 90px);
-
+    min-height: calc(100vh - 92px);
 
     display: flex;
 
+    padding: 40px 24px;
+
+    gap: 40px;
 
 }
 
 
 
-/* 왼쪽 */
+/* =====================
+   왼쪽 소개 영역
+===================== */
 
-.intro {
+.signup-intro {
 
+    flex: 1;
 
-    width: 35%;
+    min-height: 700px;
 
+    background-color: var(--color-primary-light);
 
-    background-color: #eef6ff;
-
+    border-radius: var(--radius-lg);
 
     display: flex;
 
     flex-direction: column;
 
-
     justify-content: center;
 
     align-items: center;
-
 
     text-align: center;
 
+    padding: 40px;
 
 }
 
 
 
-.intro h1 {
+.signup-intro h1 {
 
-
-    font-size: 38px;
-
-
-    margin-bottom: 45px;
-
+    margin-bottom: 32px;
 
 }
 
 
 
-.intro p {
-
-
-    font-size: 30px;
-
+.signup-intro p {
 
     font-weight: 700;
 
-
-    margin-bottom: 10px;
-
-
-}
-
-
-.intro span {
-
-    font-size: 20px;
+    margin-bottom: 12px;
 
 }
 
 
 
-/* 오른쪽 */
+
+/* =====================
+   회원가입 카드
+===================== */
 
 .signup-card {
 
-
-    width: 65%;
-
-
-    background-color: white;
-
+    flex: 1;
 
     display: flex;
 
-
     justify-content: center;
-
 
     align-items: center;
 
+    padding: 50px;
 
 }
 
 
 
-/* 폼 */
 
+/* =====================
+   폼
+===================== */
 
-form {
+.signup-form {
 
+    width: 100%;
 
-    width: 450px;
+    max-width: 450px;
 
+    display: flex;
+
+    flex-direction: column;
 
 }
+
 
 
 
 .form-group {
 
+    margin-bottom: 24px;
 
-    margin-bottom: 25px;
+    display: flex;
 
+    flex-direction: column;
+
+    gap: 10px;
 
 }
 
@@ -178,18 +127,11 @@ form {
 
 .form-group label {
 
+    font-size: var(--font-body);
 
-    display: block;
+    font-weight: 700;
 
-
-    font-size: 20px;
-
-
-    margin-bottom: 12px;
-
-
-    font-weight: 600;
-
+    color: var(--color-text);
 
 }
 
@@ -201,26 +143,33 @@ form {
     width: 100%;
 
 
-    height: 55px;
+    height: 60px;
 
 
-    border: none;
+    border-radius: var(--radius-md);
 
 
-    background-color: #e5e5e5;
+    border: 1px solid var(--color-border);
 
 
-    border-radius: 18px;
+    background-color: var(--color-white);
 
 
     padding: 0 20px;
 
 
-    font-size: 18px;
+    font-size: var(--font-body);
 
 
-    box-sizing: border-box;
+    color: var(--color-text);
 
+}
+
+
+
+.form-group input::placeholder {
+
+    color: var(--color-text-sub);
 
 }
 
@@ -229,58 +178,68 @@ form {
 .form-group input:focus {
 
 
-    outline: 3px solid #5da8ff;
+    outline: 3px solid var(--color-primary-light);
 
 
-}
-
-
-
-/* 버튼 */
-
-
-button {
-
-
-    width: 100%;
-
-
-    height: 65px;
-
-
-    margin-top: 15px;
-
-
-    border: none;
-
-
-    border-radius: 22px;
-
-
-    background-color: #5da8ff;
-
-
-    color: white;
-
-
-    font-size: 22px;
-
-
-    font-weight: 700;
-
-
-    cursor: pointer;
-
-
-    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-
+    border-color: var(--color-primary);
 
 }
 
 
 
-button:hover {
+/* JS focus 효과 */
 
-    background-color: #398df0;
+.form-group.is-focus label {
+
+    color: var(--color-primary);
+
+}
+
+
+
+
+/* =====================
+   버튼
+===================== */
+
+.signup-form .btn {
+
+    margin-top: 16px;
+
+}
+
+
+
+
+
+/* =====================
+   반응형
+===================== */
+
+@media (max-width: 900px) {
+
+
+    .signup-page {
+
+        flex-direction: column;
+
+    }
+
+
+
+    .signup-intro {
+
+        min-height: 300px;
+
+    }
+
+
+
+    .signup-card {
+
+        padding: 32px 20px;
+
+    }
+
 
 }

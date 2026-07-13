@@ -1,82 +1,79 @@
+{% extends 'base.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="ko">
 
-<head>
-    <meta charset="UTF-8">
-    <title>마이페이지</title>
-
-    <link rel="stylesheet" href="{% static 'css/my_page.css' %}">
-</head>
-
-
-<body>
-
-
-<header class="navbar">
-
-    <a href="#" class="nav-item">
-        🏠 검색하기
-    </a>
-
-    <a href="#" class="nav-item">
-        ✎ 설명서 작성
-    </a>
-
-    <a href="#" class="nav-item">
-        ❔ 질문 목록
-    </a>
-
-    <a href="#" class="nav-item">
-        🔖 나의 저장소
-    </a>
-
-    <a href="#" class="nav-item active">
-        👤 나의 정보
-    </a>
-
-    <a href="#" class="nav-item">
-        ↪ 로그아웃
-    </a>
-
-</header>
+{% block title %}
+마이페이지 - 똑디
+{% endblock %}
 
 
 
-<main class="mypage-container">
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/my_page.css' %}">
+{% endblock %}
 
 
-    <section class="menu-box">
+
+{% block content %}
+
+<main class="mypage-page">
 
 
+    <section class="mypage-container card">
+
+
+        <!-- 내 정보 수정 -->
         <div class="menu-row">
 
-            <p>
-                나의 정보를 수정하고 싶다면?<br>
-                오른쪽 버튼을 눌러주세요!
-            </p>
+
+            <div class="menu-text">
+
+                <h2 class="text-card-title">
+                    내 정보 수정
+                </h2>
 
 
-            <!-- 이동 버튼 -->
-            <a href="{% url 'my_info' %}" class="move-btn">
+                <p class="text-body">
+                    나의 정보를 수정하고 싶다면?<br>
+                    오른쪽 버튼을 눌러주세요!
+                </p>
+
+            </div>
+
+
+
+            <a href="{% url 'my_info' %}" class="btn btn-primary">
                 내 정보 수정
             </a>
+
 
         </div>
 
 
 
 
+
+        <!-- 가족 연동 -->
         <div class="menu-row">
 
-            <p>
-                나의 가족과 연동된 페이지를 보고 싶다면?<br>
-                오른쪽 버튼을 눌러주세요!
-            </p>
+
+            <div class="menu-text">
+
+                <h2 class="text-card-title">
+                    가족 연동
+                </h2>
 
 
-            <a href="#" class="move-btn">
+                <p class="text-body">
+                    나의 가족과 연동된 페이지를 보고 싶다면?<br>
+                    오른쪽 버튼을 눌러주세요!
+                </p>
+
+            </div>
+
+
+
+            <a href="{% url 'family_connect' %}" class="btn btn-primary">
                 가족 연동
             </a>
 
@@ -84,12 +81,17 @@
         </div>
 
 
+
     </section>
-
-
-
+    
 </main>
 
 
-</body>
-</html>
+{% endblock %}
+
+
+
+
+{% block extra_js %}
+<script src="{% static 'js/my_page.js' %}"></script>
+{% endblock %}

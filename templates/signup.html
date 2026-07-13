@@ -1,63 +1,40 @@
-<!DOCTYPE html>
-<html lang="ko">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>회원가입</title>
-
-    <link rel="stylesheet" href="./css/reset.css">
-    <link rel="stylesheet" href="./css/signup.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
-</head>
+{% extends 'base.html' %}
+{% load static %}
 
 
-<body>
+{% block title %}
+회원가입 - 똑디
+{% endblock %}
 
 
-<!-- nav -->
-    <header>
 
-        <div class="nav">
-
-            <a href="#"><i class="fa-solid fa-house"></i> 검색하기</a>
-
-            <a href="#"><i class="fa-solid fa-pen"></i> 설명서 작성</a>
-
-            <a href="#"><i class="fa-regular fa-circle-question"></i> 질문하기</a>
-
-            <a href="#"><i class="fa-regular fa-bookmark"></i> 나의 저장소</a>
-
-            <a href="#"><i class="fa-regular fa-user"></i> 나의 정보</a>
-
-            <a href="#"><i class="fa-solid fa-right-from-bracket"></i> 로그아웃</a>
-
-        </div>
-
-    </header>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/signup.css' %}">
+{% endblock %}
 
 
+
+{% block content %}
 
 <main class="signup-page">
 
 
-    <!-- 왼쪽 설명 -->
-    <section class="intro">
+    <!-- 왼쪽 소개 영역 -->
+    <section class="signup-intro">
 
-        <h1>
-            회원가입 페이지 입니다.
+
+        <h1 class="text-h1">
+            회원가입 페이지입니다.
         </h1>
 
 
-        <p>
-            똑똑의 가족이 되어주세요
+        <p class="text-body">
+            똑디의 가족이 되어주세요 😊
         </p>
 
 
-        <span>
-            (추후 문구 수정예정)
+        <span class="text-small">
+            디지털 설명서를 통해 더 편리한 생활을 시작해보세요.
         </span>
 
 
@@ -65,88 +42,145 @@
 
 
 
-    <!-- 오른쪽 회원가입 -->
-    <section class="signup-card">
 
 
-        <form>
+    <!-- 회원가입 카드 -->
+    <section class="signup-card card">
 
 
+        <form class="signup-form" method="post">
+
+            {% csrf_token %}
+
+
+
+            <!-- 아이디 -->
             <div class="form-group">
 
-                <label>
-                    원하시는 아이디를 밑에 입력해주세요
+                <label for="username">
+                    원하시는 아이디를 입력해주세요
                 </label>
 
-                <input type="text">
+                <input 
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="아이디 입력"
+                    required
+                >
 
             </div>
 
 
 
+
+            <!-- 이메일 -->
             <div class="form-group">
 
-                <label>
-                    이메일 주소를 밑에 입력해주세요
+                <label for="email">
+                    이메일 주소를 입력해주세요
                 </label>
 
-                <input type="email">
+                <input 
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="이메일 입력"
+                    required
+                >
 
             </div>
 
 
 
+
+            <!-- 이름 -->
             <div class="form-group">
 
-                <label>
-                    성함을 밑에 입력해주세요
+                <label for="name">
+                    성함을 입력해주세요
                 </label>
 
-                <input type="text">
+                <input 
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="이름 입력"
+                    required
+                >
 
             </div>
 
 
 
+
+            <!-- 생년월일 -->
             <div class="form-group">
 
-                <label>
-                    생년월일을 밑에 입력해주세요
+                <label for="birth">
+                    생년월일을 입력해주세요
                 </label>
 
-                <input type="date">
+                <input 
+                    type="date"
+                    id="birth"
+                    name="birth"
+                    required
+                >
 
             </div>
 
 
 
+
+            <!-- 비밀번호 -->
             <div class="form-group">
 
-                <label>
-                    원하시는 비밀번호를 밑에 입력해주세요
+                <label for="password">
+                    원하시는 비밀번호를 입력해주세요
                 </label>
 
-                <input type="password">
+                <input 
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="비밀번호 입력"
+                    required
+                >
 
             </div>
 
 
 
+
+            <!-- 비밀번호 확인 -->
             <div class="form-group">
 
-                <label>
-                    위의 비밀번호를 밑에 한번 더 입력해주세요
+                <label for="password-check">
+                    비밀번호를 한번 더 입력해주세요
                 </label>
 
-                <input type="password">
+                <input 
+                    type="password"
+                    id="password-check"
+                    name="password-check"
+                    placeholder="비밀번호 확인"
+                    required
+                >
 
             </div>
 
 
 
-            <button type="submit">
+
+            <!-- 완료 버튼 -->
+            <button 
+                type="submit"
+                class="btn btn-primary btn-block"
+            >
                 회원가입 완료
             </button>
+
 
 
         </form>
@@ -158,6 +192,11 @@
 </main>
 
 
+{% endblock %}
 
-</body>
-</html>
+
+
+
+{% block extra_js %}
+<script src="{% static 'js/signup.js' %}"></script>
+{% endblock %}
