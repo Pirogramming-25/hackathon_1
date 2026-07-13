@@ -656,10 +656,22 @@ class MyPageAPITests(APITestCase):
         contents = [a["content"] for a in response.data["data"]["results"]]
         self.assertEqual(contents, ["내 답변"])
     
-    def test_my_answer_list_includes_is_accepted(self):
+    def test_my_answer_list_returns_false_for_unaccepted_answer(self):
         self.client.force_authenticate(user=self.user)
         response = self.client.get("/api/users/me/answers/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         result = response.data["data"]["results"][0]
         self.assertIn("is_accepted", result)
         self.assertFalse(result["is_accepted"])
+
+    def test_my_answer_list_returns_true_for_accepted_answer(self):
+        self.my_answer.is_accepted = True
+        self.my_answer.save(update_fields=["is_accepted"])
+
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get("/api/users/me/answers/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        result = response.data["data"]["results"][0]
+        self.assertEqual(result["id"], self.my_answer.id)
+        self.assertTrue(result["is_accepted"])
