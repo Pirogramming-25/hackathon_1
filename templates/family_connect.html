@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+가족 연동 관리 - 똑디
+{% endblock %}
+
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'css/family_connect.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<main class="family-page">
+    {% csrf_token %}
+
+<section class="family-container">
+
+
+
+    <!-- 아이디 검색 -->
+    <div class="content-section card">
+
+
+        <h2 class="text-card-title">
+            가족 아이디 검색
+        </h2>
+
+
+        <p class="text-body">
+            연동하고 싶은 가족의 아이디를 검색해주세요.
+        </p>
+
+
+
+        <div class="search-box">
+
+            <input 
+                type="text"
+                id="family-search-input"
+                placeholder="아이디를 입력하세요"
+            >
+
+
+            <button 
+                type="button"
+                id="search-btn"
+                class="btn btn-primary"
+            >
+                검색
+            </button>
+
+        </div>
+
+
+
+        <!-- 검색 결과 -->
+        <div id="search-result" class="search-result">
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- 요청 관리 -->
+    <div class="request-section">
+
+
+
+        <!-- 받은 요청 -->
+        <section class="content-section card">
+
+
+            <h2 class="text-card-title">
+                받은 요청 (수신)
+            </h2>
+
+
+            <div class="request-list received-list">
+
+
+                <!-- 요청 데이터가 들어오는 영역 -->
+
+
+            </div>
+
+
+        </section>
+
+
+
+
+
+        <!-- 보낸 요청 -->
+        <section class="content-section card">
+
+
+            <h2 class="text-card-title">
+                보낸 요청 (발신)
+            </h2>
+
+
+            <div class="request-list sent-list">
+
+
+                <!-- 요청 데이터가 들어오는 영역 -->
+
+
+            </div>
+
+
+        </section>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- 가족 목록 -->
+    <section class="content-section card">
+
+
+        <h2 class="text-card-title">
+            연동된 가족 목록
+        </h2>
+
+
+
+        <div class="family-list">
+
+
+            <!-- 가족 데이터가 들어오는 영역 -->
+
+
+        </div>
+
+
+
+    </section>
+
+
+
+</section>
+
+</main>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script src="{% static 'js/family_connect.js' %}"></script>
+
+{% endblock %}

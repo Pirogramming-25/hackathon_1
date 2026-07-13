@@ -1,0 +1,245 @@
+/* =====================================
+   똑디 회원가입 페이지
+   static/css/signup.css
+===================================== */
+
+
+/* =====================
+   회원가입 전체
+===================== */
+
+.signup-page {
+
+    min-height: calc(100vh - 92px);
+
+    display: flex;
+
+    padding: 40px 24px;
+
+    gap: 40px;
+
+}
+
+
+
+/* =====================
+   왼쪽 소개 영역
+===================== */
+
+.signup-intro {
+
+    flex: 1;
+
+    min-height: 700px;
+
+    background-color: var(--color-primary-light);
+
+    border-radius: var(--radius-lg);
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    text-align: center;
+
+    padding: 40px;
+
+}
+
+
+
+.signup-intro h1 {
+
+    margin-bottom: 32px;
+
+}
+
+
+
+.signup-intro p {
+
+    font-weight: 700;
+
+    margin-bottom: 12px;
+
+}
+
+
+
+
+/* =====================
+   회원가입 카드
+===================== */
+
+.signup-card {
+
+    flex: 1;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 50px;
+
+}
+
+
+
+
+/* =====================
+   폼
+===================== */
+
+.signup-form {
+
+    width: 100%;
+
+    max-width: 450px;
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+
+
+
+
+.form-group {
+
+    margin-bottom: 24px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+}
+
+
+
+.form-group label {
+
+    font-size: var(--font-body);
+
+    font-weight: 700;
+
+    color: var(--color-text);
+
+}
+
+
+
+.form-group input {
+
+
+    width: 100%;
+
+
+    height: 60px;
+
+
+    border-radius: var(--radius-md);
+
+
+    border: 1px solid var(--color-border);
+
+
+    background-color: var(--color-white);
+
+
+    padding: 0 20px;
+
+
+    font-size: var(--font-body);
+
+
+    color: var(--color-text);
+
+}
+
+
+
+.form-group input::placeholder {
+
+    color: var(--color-text-sub);
+
+}
+
+
+
+.form-group input:focus {
+
+
+    outline: 3px solid var(--color-primary-light);
+
+
+    border-color: var(--color-primary);
+
+}
+
+
+
+/* JS focus 효과 */
+
+.form-group.is-focus label {
+
+    color: var(--color-primary);
+
+}
+
+
+
+
+/* =====================
+   버튼
+===================== */
+
+.signup-form .btn {
+
+    margin-top: 16px;
+
+}
+
+
+
+
+
+/* =====================
+   반응형
+===================== */
+
+@media (max-width: 900px) {
+
+
+    .signup-page {
+
+        flex-direction: column;
+
+    }
+
+
+
+    .signup-intro {
+
+        min-height: 300px;
+
+    }
+
+
+
+    .signup-card {
+
+        padding: 32px 20px;
+
+    }
+
+
+}

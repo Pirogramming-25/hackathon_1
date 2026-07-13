@@ -15,7 +15,7 @@
 
     <h1 class="text-h1 home-hero__title">무엇이 궁금하신가요?</h1>
 
-    <form action="{% url 'guides:list' %}" method="get" class="search-box" id="searchForm">
+    <form action="/api/guides/" method="get" class="search-box" id="searchForm">
       <button type="button"
               class="search-box__plus"
               id="quickAskBtn"
@@ -59,7 +59,7 @@
 {# quickAskBtn 이 로그인 여부에 따라 다른 곳으로 이동해야 하므로, 아래 값을 view에서 내려주세요 #}
 <script>
   window.DDOKDI_IS_AUTHENTICATED = {{ user.is_authenticated|yesno:"true,false" }};
-  window.DDOKDI_LOGIN_URL = "{% url 'accounts:login' %}";
-  window.DDOKDI_QUESTION_CREATE_URL = "{% url 'questions:create' %}";
+  window.DDOKDI_LOGIN_URL = "{% url 'login' %}";
+  window.DDOKDI_QUESTION_CREATE_URL = "/api/questions/";
 </script>
 {% endblock %}
