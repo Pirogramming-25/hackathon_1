@@ -95,7 +95,7 @@ class GuideAPITests(APITestCase):
         self.assertEqual(Guide.objects.filter(title="공격").count(), 0)
 
     def test_guide_search_and_filter(self):
-        Guide.objects.all().delete()
+        Guide.objects.all().delete() 
         Guide.objects.create(author=self.user, title="금융 가이드", category="FINANCE", visibility="PUBLIC")
         Guide.objects.create(author=self.user, title="생활 가이드", category="LIFE", visibility="PUBLIC")
         
