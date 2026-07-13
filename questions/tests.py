@@ -655,3 +655,11 @@ class MyPageAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         contents = [a["content"] for a in response.data["data"]["results"]]
         self.assertEqual(contents, ["내 답변"])
+    
+    def test_my_answer_list_includes_is_accepted(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get("/api/users/me/answers/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        result = response.data["data"]["results"][0]
+        self.assertIn("is_accepted", result)
+        self.assertFalse(result["is_accepted"])

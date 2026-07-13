@@ -310,5 +310,6 @@ class MyAnswerListSerializer(serializers.ModelSerializer):
             "question_id",
             "question_title",
             "content",
+            "is_accepted",
             "created_at",
         ]
