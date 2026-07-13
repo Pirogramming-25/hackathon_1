@@ -23,6 +23,7 @@ def index(request):
                 "admin": "/admin/",
                 "health": "/api/health/",
                 "auth": "/api/auth/",
+                "users": "/api/users/",
                 "guides": "/api/guides/",
                 "questions": "/api/questions/",
                 "families": "/api/families/",
@@ -37,6 +38,7 @@ urlpatterns = [
     path("api/health/", health_check),
 
     path("api/auth/", include("accounts.urls")),
+    path("api/users/", include("accounts.user_urls")),
     path("api/guides/", include("guides.urls")),
     path("api/questions/", include("questions.urls")),
     path("api/families/", include("families.urls")),
