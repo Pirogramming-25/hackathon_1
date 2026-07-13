@@ -1,5 +1,8 @@
+# guides/serializers.py
 from rest_framework import serializers
-from .models import Guide, GuideImage, GuideLike, GuideScrap
+from django.db import transaction
+from .models import Guide, GuideImage
+from questions.models import Answer
 
 class GuideImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -8,47 +11,100 @@ class GuideImageSerializer(serializers.ModelSerializer):
 
 class GuideSerializer(serializers.ModelSerializer):
     images = GuideImageSerializer(many=True, read_only=True)
+    author = serializers.ReadOnlyField(source='author.username')
     
-    is_liked = serializers.SerializerMethodField()
-    is_scrapped = serializers.SerializerMethodField()
-    like_count = serializers.IntegerField(source='likes.count', read_only=True)
-    scrap_count = serializers.IntegerField(source='scraps.count', read_only=True)
-    # 업로드용 필드
+    is_liked = serializers.BooleanField(read_only=True, default=False)
+    is_scrapped = serializers.BooleanField(read_only=True, default=False)
+    like_count = serializers.IntegerField(read_only=True, default=0)
+    scrap_count = serializers.IntegerField(read_only=True, default=0)
+    
     uploaded_images = serializers.ListField(child=serializers.ImageField(), write_only=True, required=False)
     uploaded_descriptions = serializers.ListField(child=serializers.CharField(), write_only=True, required=False)
     uploaded_is_baked = serializers.ListField(child=serializers.BooleanField(), write_only=True, required=False)
-    
+
+    source_answer_id = serializers.IntegerField(write_only=True, required=False)
 
     class Meta:
         model = Guide
         fields = [
-            'id', 'title', 'category', 'visibility', 'images', 
-            'uploaded_images', 'uploaded_descriptions', 'uploaded_is_baked', 
-            'author', 'is_liked', 'is_scrapped', 'like_count', 'scrap_count'
+            'id', 'title', 'category', 'visibility', 'view_count',
+            'created_at', 'updated_at', 'images', 'author', 
+            'is_liked', 'is_scrapped', 'like_count', 'scrap_count',
+            'uploaded_images', 'uploaded_descriptions', 'uploaded_is_baked','source_answer_id'
         ]
-        read_only_fields = ['author']
+        read_only_fields = ['view_count', 'created_at', 'updated_at']
 
-    def get_is_liked(self, obj):
-        user = self.context['request'].user
-        if user.is_authenticated:
-            return GuideLike.objects.filter(user=user, guide=obj).exists()
-        return False
+    def validate(self, attrs):
+        source_answer_id = attrs.get('source_answer_id')
+        images = attrs.get('uploaded_images', [])
+        
+        if source_answer_id:
+            try:
+                answer = Answer.objects.get(id=source_answer_id)
+            except Answer.DoesNotExist:
+                raise serializers.ValidationError({"source_answer_id": "존재하지 않는 답변입니다."})
+            
+            # 본인 확인 보안 로직
+            request = self.context.get('request')
+            if request and answer.author != request.user:
+                raise serializers.ValidationError({"source_answer_id": "본인이 작성한 답변만 등록할 수 있습니다."})
+        else:
+            if len(images) > 30:
+                raise serializers.ValidationError({"uploaded_images": "이미지는 최대 30장까지만 등록할 수 있습니다."})
+                
+        return attrs
 
-    def get_is_scrapped(self, obj):
-        user = self.context['request'].user
-        if user.is_authenticated:
-            return GuideScrap.objects.filter(user=user, guide=obj).exists()
-        return False
+    def _save_images(self, guide, images, descriptions, is_baked_list):
+        for i, image in enumerate(images):
+            desc = descriptions[i] if i < len(descriptions) else ""
+            baked = is_baked_list[i] if i < len(is_baked_list) else False
+            GuideImage.objects.create(
+                guide=guide, 
+                image=image, 
+                description=desc, 
+                is_baked=baked, 
+                display_order=i + 1
+            )
 
     def create(self, validated_data):
+        source_answer_id = validated_data.pop('source_answer_id', None)
         images = validated_data.pop('uploaded_images', [])
         descriptions = validated_data.pop('uploaded_descriptions', [])
         is_baked_list = validated_data.pop('uploaded_is_baked', [])
         
-        guide = Guide.objects.create(**validated_data)
-        
-        for i, image in enumerate(images):
-            desc = descriptions[i] if i < len(descriptions) else ""
-            baked = is_baked_list[i] if i < len(is_baked_list) else False
-            GuideImage.objects.create(guide=guide, image=image, description=desc, is_baked=baked, display_order=i+1)
+        with transaction.atomic():
+            guide = Guide.objects.create(**validated_data)
+            
+            if source_answer_id:
+                # 🌟 [답변 승격 모드] 답변 이미지를 서버 내부에서 직접 복사
+                answer = Answer.objects.get(id=source_answer_id)
+                answer_images = answer.images.all().order_by('display_order')
+                
+                for a_img in answer_images:
+                    g_img = GuideImage(
+                        guide=guide, 
+                        description=a_img.description, 
+                        display_order=a_img.display_order,
+                        is_baked=False
+                    )
+                    # 실제 원본 이미지 파일을 물리적으로 복사
+                    file_name = a_img.image.name.split('/')[-1]
+                    g_img.image.save(file_name, a_img.image.file, save=True)
+            else:
+                # 🌟 [일반 작성 모드]
+                self._save_images(guide, images, descriptions, is_baked_list)
+                
         return guide
+
+    def update(self, instance, validated_data):
+        images = validated_data.pop('uploaded_images', None)
+        descriptions = validated_data.pop('uploaded_descriptions', [])
+        is_baked_list = validated_data.pop('uploaded_is_baked', [])
+        
+        with transaction.atomic():
+            instance = super().update(instance, validated_data)
+            if images is not None:
+                instance.images.all().delete()
+                self._save_images(instance, images, descriptions, is_baked_list)
+                
+        return instance

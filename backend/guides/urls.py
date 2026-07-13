@@ -1,10 +1,10 @@
 # guides/urls.py
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import GuideViewSet # GuideViewSet만 있으면 됩니다!
+from rest_framework.routers import SimpleRouter
+from .views import GuideViewSet
 
-router = DefaultRouter()
-router.register(r'', GuideViewSet) 
+router = SimpleRouter()
+router.register('', GuideViewSet, basename='guide')
 
 urlpatterns = [
     path('', include(router.urls)),
