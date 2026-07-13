@@ -1,0 +1,78 @@
+/* 모든 요소 초기화 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 기본 설정 */
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: "Pretendard", sans-serif;
+    color: #222;
+    background-color: #fff;
+    line-height: 1.5;
+}
+
+/* 링크 */
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* 리스트 */
+ul,
+ol {
+    list-style: none;
+}
+
+/* 이미지 */
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/* 버튼 */
+button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font: inherit;
+}
+
+/* 입력 요소 */
+input,
+textarea,
+select,
+button {
+    font: inherit;
+    outline: none;
+}
+
+input,
+textarea {
+    border: none;
+    resize: none;
+}
+
+/* 테이블 */
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+/* 제목 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: inherit;
+    font-size: inherit;
+}
