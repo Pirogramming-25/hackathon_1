@@ -1,6 +1,3 @@
-from django.test import TestCase
-
-# Create your tests here.
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -265,6 +262,7 @@ class FamilyAPITestCase(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNone(response.data["data"])
         self.assertFalse(FamilyRelation.objects.filter(pk=relation.pk).exists())
 
     def test_non_participant_cannot_delete_family_relation(self):

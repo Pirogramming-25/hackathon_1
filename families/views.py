@@ -224,4 +224,4 @@ class FamilyRelationDeleteView(APIView):
             return error_response("연동된 가족 관계만 해제할 수 있습니다.")
 
         relation.delete()
-        return success_response({}, "가족 연동을 해제했습니다.")
+        return success_response(None, "가족 연동을 해제했습니다.")

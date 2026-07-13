@@ -95,6 +95,7 @@ class AuthAPITestCase(TestCase):
 
         self.assertEqual(logout_response.status_code, status.HTTP_200_OK)
         self.assertTrue(logout_response.data["success"])
+        self.assertIsNone(logout_response.data["data"])
 
     def test_login_rejects_invalid_password(self):
         response = self.client.post(
@@ -115,6 +116,8 @@ class AuthAPITestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertFalse(response.data["success"])
         self.assertIn("message", response.data)
+        self.assertIn("data", response.data)
+        self.assertIsNone(response.data["data"])
 
     def test_get_me(self):
         self.client.force_login(self.user)
