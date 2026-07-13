@@ -1,0 +1,199 @@
+*{
+    box-sizing:border-box;
+}
+
+
+body{
+
+    margin:0;
+
+    font-family:"Pretendard", sans-serif;
+
+    color:#222;
+
+}
+
+
+
+/* 상단 메뉴 */
+
+.navbar{
+
+    height:90px;
+
+    background:#eeeeee;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:15px;
+
+}
+
+
+
+.nav-item{
+
+    width:160px;
+
+    height:55px;
+
+    border-radius:18px;
+
+    background:#5da8f5;
+
+    color:white;
+
+    text-decoration:none;
+
+    font-size:22px;
+
+    font-weight:700;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    box-shadow:0 4px 10px rgba(0,0,0,0.12);
+
+}
+
+
+.nav-item.active{
+
+    background:#3478db;
+
+}
+
+
+
+
+/* 본문 */
+
+.mypage-container{
+
+
+    min-height:700px;
+
+
+    display:flex;
+
+
+    justify-content:center;
+
+
+    align-items:center;
+
+
+}
+
+
+
+.menu-box{
+
+    width:900px;
+
+}
+
+
+
+.menu-row{
+
+
+    display:flex;
+
+
+    justify-content:center;
+
+
+    align-items:center;
+
+
+    gap:120px;
+
+
+    margin-bottom:100px;
+
+
+}
+
+
+
+.menu-row p{
+
+
+    width:500px;
+
+
+    text-align:center;
+
+
+    font-size:32px;
+
+
+    line-height:1.5;
+
+
+    margin:0;
+
+
+}
+
+
+
+
+.move-btn{
+
+
+    width:180px;
+
+
+    height:60px;
+
+
+    background:#3478db;
+
+
+    color:white;
+
+
+    border-radius:18px;
+
+
+    display:flex;
+
+
+    justify-content:center;
+
+
+    align-items:center;
+
+
+    text-decoration:none;
+
+
+    font-size:22px;
+
+
+    font-weight:700;
+
+
+    box-shadow:0 5px 10px rgba(0,0,0,0.15);
+
+
+}
+
+
+
+.move-btn:hover{
+
+
+    background:#2463be;
+
+
+}

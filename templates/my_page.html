@@ -1,0 +1,95 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>마이페이지</title>
+
+    <link rel="stylesheet" href="{% static 'css/my_page.css' %}">
+</head>
+
+
+<body>
+
+
+<header class="navbar">
+
+    <a href="#" class="nav-item">
+        🏠 검색하기
+    </a>
+
+    <a href="#" class="nav-item">
+        ✎ 설명서 작성
+    </a>
+
+    <a href="#" class="nav-item">
+        ❔ 질문 목록
+    </a>
+
+    <a href="#" class="nav-item">
+        🔖 나의 저장소
+    </a>
+
+    <a href="#" class="nav-item active">
+        👤 나의 정보
+    </a>
+
+    <a href="#" class="nav-item">
+        ↪ 로그아웃
+    </a>
+
+</header>
+
+
+
+<main class="mypage-container">
+
+
+    <section class="menu-box">
+
+
+        <div class="menu-row">
+
+            <p>
+                나의 정보를 수정하고 싶다면?<br>
+                오른쪽 버튼을 눌러주세요!
+            </p>
+
+
+            <!-- 이동 버튼 -->
+            <a href="{% url 'my_info' %}" class="move-btn">
+                내 정보 수정
+            </a>
+
+        </div>
+
+
+
+
+        <div class="menu-row">
+
+            <p>
+                나의 가족과 연동된 페이지를 보고 싶다면?<br>
+                오른쪽 버튼을 눌러주세요!
+            </p>
+
+
+            <a href="#" class="move-btn">
+                가족 연동
+            </a>
+
+
+        </div>
+
+
+    </section>
+
+
+
+</main>
+
+
+</body>
+</html>

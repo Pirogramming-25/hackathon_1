@@ -1,0 +1,153 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>로그인</title>
+
+    <link rel="stylesheet" href="./css/reset.css">
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+</head>
+
+
+<body>
+
+
+    <!-- nav -->
+    <header>
+
+        <div class="nav">
+
+            <a href="#"><i class="fa-solid fa-house"></i> 검색하기</a>
+
+            <a href="#"><i class="fa-solid fa-pen"></i> 설명서 작성</a>
+
+            <a href="#"><i class="fa-regular fa-circle-question"></i> 질문하기</a>
+
+            <a href="#"><i class="fa-regular fa-bookmark"></i> 나의 저장소</a>
+
+            <a href="#"><i class="fa-regular fa-user"></i> 나의 정보</a>
+
+            <a href="#"><i class="fa-solid fa-right-from-bracket"></i> 로그아웃</a>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- login -->
+    <main class="login-page">
+
+
+        <section class="login-container">
+
+
+            <!-- 환영 문구 -->
+            <div class="login-title">
+
+                <h1>
+                    😊 똑띠에 오신 것을 환영합니다 😊
+                </h1>
+
+            </div>
+
+
+
+            <!-- 로그인 form -->
+            <form class="login-form">
+
+
+                <!-- 아이디 -->
+                <div class="input-box">
+
+                    <label for="id">
+                        아이디를 밑에 입력해주세요
+                    </label>
+
+
+                    <input 
+                        type="text"
+                        id="id"
+                        placeholder=""
+                    >
+
+                </div>
+
+
+
+                <!-- 비밀번호 -->
+                <div class="input-box">
+
+                    <label for="password">
+                        비밀번호를 밑에 입력해주세요
+                    </label>
+
+
+                    <input 
+                        type="password"
+                        id="password"
+                        placeholder=""
+                    >
+
+                </div>
+
+
+
+
+                <!-- 로그인 버튼 -->
+                <button 
+                    type="submit"
+                    class="login-button"
+                >
+                    다 입력했어요!
+                </button>
+
+
+
+            </form>
+
+
+
+
+            <!-- 회원가입 -->
+            <div class="signup-area">
+
+
+                <p>
+                    혹시 똑띠가 처음이라면
+                </p>
+
+
+                <a href="./signup.html" class="signup-button">
+                    여기를
+                </a>
+
+
+                <p>
+                    눌러주세요
+                </p>
+
+
+            </div>
+
+
+
+        </section>
+
+
+    </main>
+
+<script src="./js/login.js"></script>
+
+
+</body>
+
+</html>

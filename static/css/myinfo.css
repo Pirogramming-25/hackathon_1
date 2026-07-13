@@ -1,0 +1,240 @@
+* {
+    box-sizing: border-box;
+}
+
+
+body {
+
+    margin:0;
+
+    font-family: "Pretendard", sans-serif;
+
+    color:#222;
+
+    background:white;
+
+}
+
+
+
+/* 상단 메뉴 */
+
+.navbar {
+
+    height:110px;
+
+    background:#eeeeee;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:18px;
+
+}
+
+
+
+.nav-item {
+
+    width:205px;
+
+    height:65px;
+
+    background:#5fa8f5;
+
+    border-radius:20px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:10px;
+
+    color:white;
+
+    font-size:26px;
+
+    font-weight:700;
+
+    text-decoration:none;
+
+    box-shadow:0 4px 10px rgba(0,0,0,0.15);
+
+}
+
+
+.nav-item.active {
+
+    background:#2f80ed;
+
+}
+
+
+
+
+
+/* 전체 */
+
+.container {
+
+    display:flex;
+
+    max-width:1200px;
+
+    margin:100px auto;
+
+    gap:150px;
+
+}
+
+
+
+/* 왼쪽 제목 */
+
+.title-box {
+
+    width:400px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+}
+
+
+.title-box h1 {
+
+    font-size:45px;
+
+    line-height:1.6;
+
+    font-weight:700;
+
+}
+
+
+.title-box p {
+
+    font-size:22px;
+
+    color:#555;
+
+    line-height:1.6;
+
+}
+
+
+
+
+/* 오른쪽 */
+
+.info-form {
+
+    width:520px;
+
+}
+
+
+
+.info-row {
+
+    margin-bottom:35px;
+
+}
+
+
+
+.info-row label {
+
+    display:block;
+
+    font-size:24px;
+
+    font-weight:600;
+
+    margin-bottom:12px;
+
+}
+
+
+
+
+.input-area {
+
+    display:flex;
+
+    align-items:center;
+
+    gap:35px;
+
+}
+
+
+
+.input-area input {
+
+
+    width:350px;
+
+    height:60px;
+
+    border:none;
+
+    border-radius:18px;
+
+    background:#e5e7eb;
+
+    font-size:22px;
+
+    padding:0 20px;
+
+}
+
+
+
+.input-area button {
+
+
+    width:110px;
+
+    height:55px;
+
+
+    border:none;
+
+    border-radius:18px;
+
+
+    background:#3478db;
+
+
+    color:white;
+
+
+    font-size:22px;
+
+
+    font-weight:700;
+
+
+    cursor:pointer;
+
+
+    box-shadow:0 4px 8px rgba(0,0,0,0.15);
+
+}
+
+
+
+.input-area button:hover {
+
+    background:#2463be;
+
+}
