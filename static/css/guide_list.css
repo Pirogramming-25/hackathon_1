@@ -1,0 +1,134 @@
+/* static/css/guid_list.css */
+
+.guide-list-page {
+    padding-top: 50px;
+    padding-bottom: 80px;
+    max-width: 1000px; /* 피그마 비율에 맞춘 넓이 */
+    margin: 0 auto;
+}
+
+.page-title {
+    text-align: center;
+    font-size: var(--font-h1);
+    font-weight: 800;
+    margin-bottom: 30px;
+    color: var(--color-text);
+}
+
+/* --- 검색 영역 --- */
+.search-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.search-form {
+    width: 100%;
+    max-width: 600px;
+}
+
+.search-input {
+    width: 100%;
+    height: 60px;
+    padding: 0 30px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text);
+    text-align: center; /* 피그마처럼 텍스트 중앙 정렬 */
+    border: 3px solid var(--color-primary);
+    border-radius: 30px;
+    outline: none;
+    background-color: var(--color-white);
+    transition: box-shadow var(--transition-base);
+}
+
+.search-input:focus {
+    box-shadow: 0 0 0 4px var(--color-primary-light);
+}
+
+/* --- 필터 영역 --- */
+.filter-section {
+    display: flex;
+    justify-content: flex-end; /* 우측 정렬 */
+    gap: 12px;
+    margin-bottom: 40px;
+    padding-right: 20px;
+}
+
+.filter-btn {
+    height: 40px;
+    padding: 0 24px;
+    border-radius: 20px;
+    font-size: 18px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    background-color: var(--color-primary-light); /* 피그마보다 살짝 연한 기본상태 */
+    color: var(--color-primary);
+    transition: all var(--transition-base);
+}
+
+/* 선택된 상태 (피그마의 파란 버튼) */
+.filter-btn.active,
+.filter-btn:hover {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    box-shadow: 0 4px 10px rgba(49, 130, 246, 0.2);
+}
+
+/* --- 카드 그리드 영역 (4열) --- */
+.guide-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+/* --- 개별 카드 스타일 --- */
+.guide-card {
+    display: flex;
+    flex-direction: column;
+    background-color: #E6E8EA; /* 피그마의 연한 회색 바탕 */
+    padding: 12px 12px 20px 12px; /* 위/옆은 좁게, 아래는 글씨를 위해 넓게 */
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.guide-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-card-hover);
+}
+
+.card-image-placeholder {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background-color: #7B8289; /* 피그마의 짙은 회색 */
+    border-radius: var(--radius-sm);
+    margin-bottom: 16px;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text);
+    text-align: center;
+    word-break: keep-all;
+    margin: 0;
+}
+
+/* --- 반응형 (모바일 등 작은 화면 처리) --- */
+@media (max-width: 900px) {
+    .guide-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .guide-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .filter-section {
+        justify-content: center;
+        padding-right: 0;
+    }
+}
