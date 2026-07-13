@@ -19,10 +19,9 @@ User = get_user_model()
 def api_response(success, message, data=None, status_code=status.HTTP_200_OK):
     body = {
         "success": success,
+        "data": data,
         "message": message,
     }
-    if data is not None:
-        body["data"] = data
     return Response(body, status=status_code)
 
 

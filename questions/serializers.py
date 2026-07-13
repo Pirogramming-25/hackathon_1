@@ -1,5 +1,4 @@
-# backend/questions/serializers.py
-
+from django.db import transaction
 from rest_framework import serializers
 
 from .models import Answer, AnswerImage, Question, QuestionImage
@@ -73,12 +72,15 @@ class QuestionListSerializer(serializers.ModelSerializer):
         ]
 
     def get_answer_count(self, obj):
-        return obj.answers.count()
+        # QuestionViewSet.get_queryset()에서 annotate(answer_count_cache=...)로 미리 계산됨
+        return getattr(obj, "answer_count_cache", obj.answers.count())
 
     def get_thumbnail(self, obj):
-        first_image = obj.images.order_by("display_order").first()
-        if not first_image:
+        # QuestionViewSet.get_queryset()에서 prefetch_related로 미리 로딩됨
+        images = list(obj.images.all())
+        if not images:
             return None
+        first_image = images[0]
         request = self.context.get("request")
         url = first_image.image.url
         return request.build_absolute_uri(url) if request else url
@@ -153,13 +155,14 @@ class QuestionCreateUpdateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         images = validated_data.pop("images", None)
         descriptions = validated_data.pop("image_descriptions", [])
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
+        with transaction.atomic():
+            for attr, value in validated_data.items():
+                setattr(instance, attr, value)
+            instance.save()
 
-        if images is not None:
-            instance.images.all().delete()
-            self._save_images(instance, images, descriptions)
+            if images is not None:
+                instance.images.all().delete()
+                self._save_images(instance, images, descriptions)
 
         return instance
 
@@ -231,13 +234,14 @@ class AnswerCreateUpdateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         images = validated_data.pop("images", None)
         descriptions = validated_data.pop("image_descriptions", [])
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
+        with transaction.atomic():
+            for attr, value in validated_data.items():
+                setattr(instance, attr, value)
+            instance.save()
 
-        if images is not None:
-            instance.images.all().delete()
-            self._save_images(instance, images, descriptions)
+            if images is not None:
+                instance.images.all().delete()
+                self._save_images(instance, images, descriptions)
 
         return instance
 
