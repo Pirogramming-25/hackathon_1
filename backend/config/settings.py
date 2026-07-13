@@ -162,4 +162,5 @@ REST_FRAMEWORK = {
         "rest_framework.pagination.PageNumberPagination"
     ),
     "PAGE_SIZE": 10,
+    "EXCEPTION_HANDLER": "config.exception_handlers.common_exception_handler",
 }
