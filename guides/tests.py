@@ -1,3 +1,4 @@
+# guides/tests.py
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
@@ -6,7 +7,6 @@ from rest_framework.test import APITestCase
 from io import BytesIO
 from PIL import Image
 
-# 가이드 관련 모델 및 기타 필요한 것들
 from .models import Guide, Category, Visibility, GuideImage
 from questions.models import Question, Answer, AnswerImage
 
@@ -20,10 +20,10 @@ def make_image(name="test.png"):
 
 class GuideAPITests(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='tester', password='password')
+        # 유저 생성 시 고유한 이메일 명시 (에러 방지)
+        self.user = User.objects.create_user(username='tester', email='tester@test.com', password='password')
         self.client.force_authenticate(user=self.user)
         
-        # 질문과 답변 준비
         self.question = Question.objects.create(
             author=self.user, title="카카오톡 송금", content="?", category="FINANCE"
         )
@@ -34,14 +34,17 @@ class GuideAPITests(APITestCase):
         AnswerImage.objects.create(answer=self.answer, image=make_image("b.png"), description="2단계", display_order=2)
 
     def tearDown(self):
-        """테스트마다 데이터베이스를 깨끗하게 비웁니다."""
         Guide.objects.all().delete()
         Question.objects.all().delete()
         Answer.objects.all().delete()
         super().tearDown()
 
     def test_promote_answer_success(self):
-        """답변 승격 기능 테스트"""
+        """채택된 답변 승격 기능 테스트"""
+        # 1. 답변을 채택 상태로 설정
+        self.answer.is_accepted = True
+        self.answer.save()
+
         url = f"/api/guides/answers/{self.answer.id}/promote/"
         payload = {
             "title": "승격된 설명서",
@@ -51,24 +54,56 @@ class GuideAPITests(APITestCase):
         response = self.client.post(url, payload)
         
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(response.data["success"])
-        
-        # 데이터베이스에 가이드가 생성되었는지 확인
+        self.assertTrue(response.data.get("success"))
         self.assertEqual(Guide.objects.filter(title="승격된 설명서").count(), 1)
 
+    def test_promote_answer_not_accepted(self):
+        """채택되지 않은 본인 답변 승격 시 400 에러 및 객체 미생성 확인"""
+        # setUp에서 생성된 self.answer는 is_accepted=False 상태임
+        url = f"/api/guides/answers/{self.answer.id}/promote/"
+        payload = {
+            "title": "미채택 설명서",
+            "category": "FINANCE",
+            "visibility": "PUBLIC"
+        }
+        response = self.client.post(url, payload)
+        
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(response.data.get("success"))
+        self.assertEqual(response.data.get("message"), "채택된 답변만 설명서로 등록할 수 있습니다.")
+        self.assertEqual(Guide.objects.filter(title="미채택 설명서").count(), 0)
+
+    def test_promote_answer_forbidden(self):
+        """다른 사용자의 답변(채택됨) 승격 시 403 에러 확인"""
+        # 다른 유저 생성 시 고유한 이메일 명시 (에러 방지)
+        other_user = User.objects.create_user(
+            username='other', 
+            email='other@test.com', 
+            password='password'
+        )
+        other_answer = Answer.objects.create(
+            question=self.question, author=other_user, content="타인의 답변"
+        )
+        other_answer.is_accepted = True
+        other_answer.save()
+
+        url = f"/api/guides/answers/{other_answer.id}/promote/"
+        payload = {"title": "공격", "category": "FINANCE", "visibility": "PUBLIC"}
+        
+        response = self.client.post(url, payload)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Guide.objects.filter(title="공격").count(), 0)
+
     def test_guide_search_and_filter(self):
-        """검색 및 카테고리 필터 테스트"""
         Guide.objects.all().delete()
         Guide.objects.create(author=self.user, title="금융 가이드", category="FINANCE", visibility="PUBLIC")
         Guide.objects.create(author=self.user, title="생활 가이드", category="LIFE", visibility="PUBLIC")
         
         # 검색 테스트
         response = self.client.get("/api/guides/?search=금융")
+        results = response.data["data"]["results"] 
         
-        # [수정] response.data["data"]["results"] 를 사용하여 리스트 길이를 확인
-        results = response.data["data"]["results"]
-        
-        self.assertEqual(len(results), 1, f"검색 결과가 1개여야 하는데 {len(results)}개가 나왔습니다.")
+        self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["title"], "금융 가이드")
         
         # 카테고리 필터 테스트
@@ -79,10 +114,9 @@ class GuideAPITests(APITestCase):
         self.assertEqual(results[0]["title"], "생활 가이드")
 
     def test_like_scrap_toggle(self):
-        """좋아요/스크랩의 등록/취소 토글 로직 테스트"""
+        """좋아요/스크랩 토글 로직 테스트"""
         guide = Guide.objects.create(author=self.user, title="토글 테스트", category="FINANCE", visibility="PUBLIC")
         
-        # 좋아요 등록/취소
         self.client.post(f"/api/guides/{guide.id}/like/")
         response = self.client.post(f"/api/guides/{guide.id}/like/")
         
