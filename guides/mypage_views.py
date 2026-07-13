@@ -1,8 +1,9 @@
 from rest_framework import generics, permissions
 from rest_framework.response import Response
-from django.db.models import Count, Exists, OuterRef
+from django.db.models import Count, Exists, OuterRef, Q
 
-from .models import Guide, GuideLike, GuideScrap
+
+from .models import Guide, GuideLike, GuideScrap, Visibility
 from .serializers import GuideSerializer
 
 class MyGuideListView(generics.ListAPIView):
@@ -40,7 +41,11 @@ class MyScrapListView(generics.ListAPIView):
         user = self.request.user
         queryset = Guide.objects.select_related('author').prefetch_related('images')
         
-        queryset = queryset.filter(scraps__user=user)
+        queryset = queryset.filter(
+            Q(visibility=Visibility.PUBLIC) | 
+            Q(author=user) | 
+            Q(shares__recipient=user)
+        ).filter(scraps__user=user).distinct()
         
         queryset = queryset.annotate(
             is_liked=Exists(GuideLike.objects.filter(user=user, guide=OuterRef('pk'))),
