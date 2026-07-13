@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Guide, GuideImage
+from .models import Guide, GuideImage, GuideLike, GuideScrap
 
 class GuideImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -8,15 +8,37 @@ class GuideImageSerializer(serializers.ModelSerializer):
 
 class GuideSerializer(serializers.ModelSerializer):
     images = GuideImageSerializer(many=True, read_only=True)
+    
+    is_liked = serializers.SerializerMethodField()
+    is_scrapped = serializers.SerializerMethodField()
+    like_count = serializers.IntegerField(source='likes.count', read_only=True)
+    scrap_count = serializers.IntegerField(source='scraps.count', read_only=True)
     # 업로드용 필드
     uploaded_images = serializers.ListField(child=serializers.ImageField(), write_only=True, required=False)
     uploaded_descriptions = serializers.ListField(child=serializers.CharField(), write_only=True, required=False)
     uploaded_is_baked = serializers.ListField(child=serializers.BooleanField(), write_only=True, required=False)
+    
 
     class Meta:
         model = Guide
-        fields = ['id', 'title', 'category', 'visibility', 'images', 'uploaded_images', 'uploaded_descriptions', 'uploaded_is_baked', 'author']
+        fields = [
+            'id', 'title', 'category', 'visibility', 'images', 
+            'uploaded_images', 'uploaded_descriptions', 'uploaded_is_baked', 
+            'author', 'is_liked', 'is_scrapped', 'like_count', 'scrap_count'
+        ]
         read_only_fields = ['author']
+
+    def get_is_liked(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return GuideLike.objects.filter(user=user, guide=obj).exists()
+        return False
+
+    def get_is_scrapped(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return GuideScrap.objects.filter(user=user, guide=obj).exists()
+        return False
 
     def create(self, validated_data):
         images = validated_data.pop('uploaded_images', [])

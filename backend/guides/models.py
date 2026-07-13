@@ -36,16 +36,16 @@ class GuideImage(models.Model):
 
 class GuideLike(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    guide = models.ForeignKey(Guide, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True) # 좋아요 누른 시간 저장!
+    guide = models.ForeignKey(Guide, on_delete=models.CASCADE, related_name='likes')
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('user', 'guide')
 
 class GuideScrap(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    guide = models.ForeignKey(Guide, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True) # 스크랩한 시간 저장!
+    guide = models.ForeignKey(Guide, on_delete=models.CASCADE, related_name='scraps')
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('user', 'guide')
+        unique_together = ('user', 'guide') 
