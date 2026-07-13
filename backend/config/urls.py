@@ -23,6 +23,7 @@ def index(request):
                 "admin": "/admin/",
                 "health": "/api/health/",
                 "auth": "/api/auth/",
+                "users": "/api/users/",
                 "guides": "/api/guides/",
                 "questions": "/api/questions/",
                 "families": "/api/families/",
@@ -37,8 +38,12 @@ urlpatterns = [
     path("api/health/", health_check),
 
     path("api/auth/", include("accounts.urls")),
+    path("api/users/", include("accounts.user_urls")),
     path("api/guides/", include("guides.urls")),
-    path("api/questions/", include("questions.urls")),
+    path("api/questions/", include("questions.question_urls")),
+    path("api/answers/", include("questions.answer_urls")),
+    path("api/users/me/questions/", include("questions.mypage_question_urls")),  # 추가
+    path("api/users/me/answers/", include("questions.mypage_answer_urls")),      # 추가
     path("api/families/", include("families.urls")),
 ]
 
