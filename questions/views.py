@@ -1,10 +1,11 @@
+from django.db.models import Count, Prefetch
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .models import Answer, Question
+from .models import Answer, Question, QuestionImage
 from .permissions import IsAnswerAuthor, IsAnswerAuthorForGuideData, IsQuestionAuthor
 from .serializers import (
     AnswerCreateUpdateSerializer,
@@ -33,8 +34,20 @@ def error_response(message, data=None, status_code=status.HTTP_400_BAD_REQUEST):
 
 
 class QuestionViewSet(viewsets.ModelViewSet):
-    queryset = Question.objects.all().order_by("-created_at")
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Question.objects.select_related("author").order_by("-created_at")
+        if self.action == "list":
+            queryset = queryset.annotate(
+                answer_count_cache=Count("answers")
+            ).prefetch_related(
+                Prefetch(
+                    "images",
+                    queryset=QuestionImage.objects.order_by("display_order"),
+                )
+            )
+        return queryset
 
     def get_serializer_class(self):
         if self.action == "list":
