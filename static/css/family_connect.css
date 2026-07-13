@@ -132,6 +132,12 @@
 
     margin-top: 25px;
 
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 16px;
+
 }
 
 
@@ -221,6 +227,28 @@
 
 }
 
+.request-item span,
+.family-item span,
+.result-card span {
+
+    display: block;
+
+    margin-top: 4px;
+
+    color: var(--color-text-sub);
+
+    font-size: var(--font-small);
+
+}
+
+.button-group {
+
+    display: flex;
+
+    gap: 10px;
+
+}
+
 
 
 
@@ -258,12 +286,36 @@
 
     padding: 20px;
 
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 20px;
+
 
     font-size: var(--font-body);
 
 
     font-weight: 700;
 
+
+}
+
+.empty-message {
+
+    color: var(--color-text-sub);
+
+    font-size: var(--font-body);
+
+}
+
+.status-badge {
+
+    font-weight: 700;
+
+    color: var(--color-primary);
 
 }
 

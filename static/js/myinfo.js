@@ -3,255 +3,161 @@
    static/js/myinfo.js
 ===================================== */
 
-
 document.addEventListener("DOMContentLoaded", function () {
-
-
     const editButtons = document.querySelectorAll(".edit-btn");
+    const passwordButton = document.querySelector(".password-edit-btn");
 
-
-    // 페이지 접속 시 내 정보 불러오기
     loadUserInfo();
 
-
-
-    // 수정 버튼 이벤트
     editButtons.forEach(function (button) {
-
-
         button.addEventListener("click", async function () {
-
-
             const input = this.previousElementSibling;
 
-
-
-            // 수정 모드
             if (input.disabled) {
-
-
-                input.disabled = false;
-
-                input.focus();
-
-                this.textContent = "저장";
-
-                this.classList.remove("btn-secondary");
-
-                this.classList.add("btn-primary");
-
-
+                enableEdit(input, this);
+                return;
             }
 
+            const success = await updateUserInfo({
+                [input.name]: input.value,
+            });
 
-            // 저장 모드
-            else {
-
-
-                input.disabled = true;
-
-
-                this.textContent = "수정";
-
-                this.classList.remove("btn-primary");
-
-                this.classList.add("btn-secondary");
-
-
-
-                // API 수정 요청
-                await updateUserInfo(input);
-
-
+            if (success) {
+                disableEdit(input, this);
+                await loadUserInfo();
             }
-
-
         });
-
-
     });
 
+    if (passwordButton) {
+        passwordButton.addEventListener("click", async function () {
+            const passwordInputs = [
+                document.querySelector("#current-password"),
+                document.querySelector("#new-password"),
+                document.querySelector("#new-password-confirm"),
+            ].filter(Boolean);
 
+            const isEditing = passwordInputs.some(function (input) {
+                return !input.disabled;
+            });
+
+            if (!isEditing) {
+                passwordInputs.forEach(function (input) {
+                    input.disabled = false;
+                    input.value = "";
+                });
+                passwordInputs[0]?.focus();
+                this.textContent = "저장";
+                this.classList.remove("btn-secondary");
+                this.classList.add("btn-primary");
+                return;
+            }
+
+            const payload = {};
+            passwordInputs.forEach(function (input) {
+                payload[input.name] = input.value;
+            });
+
+            const success = await updateUserInfo(payload);
+            if (success) {
+                passwordInputs.forEach(function (input) {
+                    input.value = "";
+                    input.disabled = true;
+                });
+                this.textContent = "수정";
+                this.classList.remove("btn-primary");
+                this.classList.add("btn-secondary");
+            }
+        });
+    }
 });
 
+function getCookie(name) {
+    const cookies = document.cookie ? document.cookie.split(";") : [];
 
-
-
-
-// =========================
-// 내 정보 가져오기
-// =========================
-
-async function loadUserInfo() {
-
-
-    try {
-
-
-        const response = await fetch(
-            "/api/users/me/",
-            {
-                method: "GET",
-                credentials: "include",
-            }
-        );
-
-
-
-        const result = await response.json();
-
-
-
-        console.log(
-            "내 정보:",
-            result
-        );
-
-
-
-        if (!result.success) {
-
-            alert(result.message);
-
-            return;
-
+    for (const cookie of cookies) {
+        const trimmed = cookie.trim();
+        if (trimmed.startsWith(name + "=")) {
+            return decodeURIComponent(trimmed.slice(name.length + 1));
         }
-
-
-
-        const user = result.data;
-
-
-
-        const usernameInput = document.querySelector("#username");
-        const emailInput = document.querySelector("#email");
-        const nameInput = document.querySelector("#name");
-        const birthInput = document.querySelector("#birth-date");
-
-
-
-        if (usernameInput) {
-
-            usernameInput.value = user.username || "";
-
-        }
-
-
-        if (emailInput) {
-
-            emailInput.value = user.email || "";
-
-        }
-
-
-        if (nameInput) {
-
-            nameInput.value = user.name || "";
-
-        }
-
-
-        if (birthInput) {
-
-            birthInput.value = user.birth_date || "";
-
-        }
-
-
-
-    } catch (error) {
-
-
-        console.error(
-            "내 정보 조회 실패:",
-            error
-        );
-
-
     }
 
-
+    return "";
 }
 
+function getCsrfToken() {
+    const csrfInput = document.querySelector("[name=csrfmiddlewaretoken]");
+    return csrfInput?.value || getCookie("csrftoken");
+}
 
+function enableEdit(input, button) {
+    input.disabled = false;
+    input.focus();
+    button.textContent = "저장";
+    button.classList.remove("btn-secondary");
+    button.classList.add("btn-primary");
+}
 
+function disableEdit(input, button) {
+    input.disabled = true;
+    button.textContent = "수정";
+    button.classList.remove("btn-primary");
+    button.classList.add("btn-secondary");
+}
 
-
-
-
-// =========================
-// 내 정보 수정
-// =========================
-
-async function updateUserInfo(input) {
-
-
+async function loadUserInfo() {
     try {
-
-
-        const response = await fetch(
-            "/api/users/me/",
-            {
-
-                method: "PATCH",
-
-                credentials: "include",
-
-
-                headers: {
-                    "Content-Type": "application/json",
-                },
-
-
-                body: JSON.stringify({
-
-                    // name 속성 기준으로 전송
-                    [input.name]: input.value
-
-                }),
-
-            }
-        );
-
-
-
+        const response = await fetch("/api/users/me/", {
+            method: "GET",
+            credentials: "include",
+        });
         const result = await response.json();
 
-
-
-        console.log(
-            "수정 결과:",
-            result
-        );
-
-
-
         if (!result.success) {
-
-
             alert(result.message);
-
             return;
-
-
         }
 
+        const user = result.data;
+        setInputValue("#username", user.username);
+        setInputValue("#email", user.email);
+        setInputValue("#name", user.name);
+        setInputValue("#birth-date", user.birth_date);
+    } catch (error) {
+        console.error("내 정보 조회 실패:", error);
+    }
+}
 
+function setInputValue(selector, value) {
+    const input = document.querySelector(selector);
+    if (input) {
+        input.value = value || "";
+    }
+}
+
+async function updateUserInfo(payload) {
+    try {
+        const response = await fetch("/api/users/me/", {
+            method: "PATCH",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCsrfToken(),
+            },
+            body: JSON.stringify(payload),
+        });
+        const result = await response.json();
+
+        if (!result.success) {
+            alert(result.message);
+            return false;
+        }
 
         alert("정보가 저장되었습니다.");
-
-
-
+        return true;
     } catch (error) {
-
-
-        console.error(
-            "정보 수정 실패:",
-            error
-        );
-
-
+        console.error("정보 수정 실패:", error);
+        alert("정보 수정 중 오류가 발생했습니다.");
+        return false;
     }
-
-
 }

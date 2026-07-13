@@ -12,17 +12,19 @@
 
     min-height: calc(100vh - 92px);
 
-    max-width: 1200px;
+    max-width: 1280px;
 
     margin: 0 auto;
 
     padding: 80px 24px;
 
+    box-sizing: border-box;
+
     display: flex;
 
     align-items: center;
 
-    gap: 100px;
+    gap: 80px;
 
 }
 
@@ -63,7 +65,9 @@
 
 .info-form {
 
-    width: 560px;
+    width: min(660px, 100%);
+
+    box-sizing: border-box;
 
     padding: 45px;
 
@@ -120,6 +124,8 @@
 
     gap: 20px;
 
+    width: 100%;
+
 }
 
 
@@ -128,6 +134,8 @@
 
 
     flex: 1;
+
+    min-width: 0;
 
 
     height: 60px;
@@ -185,9 +193,38 @@
 
 .edit-btn {
 
-    width: 110px;
+    width: 120px;
+
+    box-sizing: border-box;
+
+    padding: 18px 16px;
 
     flex-shrink: 0;
+
+    white-space: nowrap;
+
+}
+
+.readonly-btn,
+.password-edit-btn {
+
+    width: 120px;
+
+    box-sizing: border-box;
+
+    padding: 18px 16px;
+
+    flex-shrink: 0;
+
+    white-space: nowrap;
+
+}
+
+.readonly-btn:disabled {
+
+    cursor: not-allowed;
+
+    opacity: 0.65;
 
 }
 
@@ -234,7 +271,9 @@
 
 
 
-    .edit-btn {
+    .edit-btn,
+    .readonly-btn,
+    .password-edit-btn {
 
         width: 100%;
 
