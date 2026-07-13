@@ -344,6 +344,38 @@ class AnswerAPITests(APITestCase):
             f"/api/questions/{self.question.id}/answers/", payload, format="multipart"
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_question_author_can_accept_answer(self):
+        self.client.force_authenticate(user=self.question_author)
+        response = self.client.patch(f"/api/answers/{self.answer.id}/accept/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.answer.refresh_from_db()
+        self.assertTrue(self.answer.is_accepted)
+
+    def test_non_question_author_cannot_accept_answer(self):
+        self.client.force_authenticate(user=self.other)
+        response = self.client.patch(f"/api/answers/{self.answer.id}/accept/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_accepting_answer_does_not_change_question_status(self):
+        self.client.force_authenticate(user=self.question_author)
+        self.client.patch(f"/api/answers/{self.answer.id}/accept/")
+        self.question.refresh_from_db()
+        self.assertEqual(self.question.status, Question.Status.WAITING)
+
+    def test_accepting_new_answer_unaccepts_previous(self):
+        second_answer = Answer.objects.create(
+            question=self.question, author=self.other, content="두 번째 답변"
+        )
+        self.client.force_authenticate(user=self.question_author)
+
+        self.client.patch(f"/api/answers/{self.answer.id}/accept/")
+        self.client.patch(f"/api/answers/{second_answer.id}/accept/")
+
+        self.answer.refresh_from_db()
+        second_answer.refresh_from_db()
+        self.assertFalse(self.answer.is_accepted)
+        self.assertTrue(second_answer.is_accepted)    
     
     def test_update_answer_replaces_images(self):
         self.client.force_authenticate(user=self.answer_author)
@@ -397,8 +429,12 @@ class GuideDataAPITests(APITestCase):
             author=self.answer_author, title="t", content="c", category="MEDICAL"
         )
         self.answer = Answer.objects.create(
-            question=self.question, author=self.answer_author, content="답변 내용"
+            question=self.question,
+            author=self.answer_author,
+            content="답변 내용",
+            is_accepted=True,
         )
+
         AnswerImage.objects.create(
             answer=self.answer, image=make_image("second.png"), display_order=2
         )
@@ -427,6 +463,14 @@ class GuideDataAPITests(APITestCase):
         response = self.client.get(f"/api/answers/{self.answer.id}/guide-data/")
         orders = [img["display_order"] for img in response.data["data"]["images"]]
         self.assertEqual(orders, [1, 2])
+
+    def test_guide_data_blocked_for_unaccepted_answer(self):
+        unaccepted_answer = Answer.objects.create(
+            question=self.question, author=self.answer_author, content="미선택 답변"
+        )
+        self.client.force_authenticate(user=self.answer_author)
+        response = self.client.get(f"/api/answers/{unaccepted_answer.id}/guide-data/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)    
 
 class MyPageAPITests(APITestCase):
     def setUp(self):

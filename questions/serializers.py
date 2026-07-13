@@ -45,6 +45,7 @@ class AnswerSerializer(serializers.ModelSerializer):
             "id",
             "author",
             "content",
+            "is_accepted",
             "images",
             "created_at",
             "updated_at",
