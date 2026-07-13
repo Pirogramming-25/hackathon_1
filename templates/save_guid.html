@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+저장한 설명서
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/save_guid.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="save-guid-page">
+
+    <div class="page-header">
+
+        <h1>저장한 설명서</h1>
+
+        <p>나중에 다시 보고 싶은 설명서를 모아볼 수 있습니다.</p>
+
+    </div>
+
+
+    <!-- 검색 -->
+
+    <section class="search-section">
+
+        <form class="guide-search">
+
+            <span class="material-symbols-rounded">
+                search
+            </span>
+
+            <input
+                type="text"
+                placeholder="저장한 설명서를 검색해보세요."
+            >
+
+            <button type="submit">
+                검색
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <!-- 정렬 -->
+
+    <section class="sort-section">
+
+        <button class="sort-btn active">
+            최신순
+        </button>
+
+        <button class="sort-btn">
+            이름순
+        </button>
+
+    </section>
+
+
+    <!-- 목록 -->
+
+    <section class="guide-grid">
+
+        <a href="{% url 'guides:detail' 1 %}" class="guide-card">
+
+            <div class="guide-thumbnail">
+
+                <span class="material-symbols-rounded">
+                    bookmark
+                </span>
+
+            </div>
+
+            <div class="guide-info">
+
+                <h3>카카오톡 사진 보내기</h3>
+
+            </div>
+
+        </a>
+
+
+        <a href="{% url 'guides:detail' 2 %}" class="guide-card">
+
+            <div class="guide-thumbnail">
+
+                <span class="material-symbols-rounded">
+                    bookmark
+                </span>
+
+            </div>
+
+            <div class="guide-info">
+
+                <h3>정부24 주민등록등본 발급</h3>
+
+            </div>
+
+        </a>
+
+
+        <a href="{% url 'guides:detail' 3 %}" class="guide-card">
+
+            <div class="guide-thumbnail">
+
+                <span class="material-symbols-rounded">
+                    bookmark
+                </span>
+
+            </div>
+
+            <div class="guide-info">
+
+                <h3>병원 예약하기</h3>
+
+            </div>
+
+        </a>
+
+
+        <a href="{% url 'guides:detail' 4 %}" class="guide-card">
+
+            <div class="guide-thumbnail">
+
+                <span class="material-symbols-rounded">
+                    bookmark
+                </span>
+
+            </div>
+
+            <div class="guide-info">
+
+                <h3>키오스크 주문하기</h3>
+
+            </div>
+
+        </a>
+
+
+        <a href="{% url 'guides:detail' 5 %}" class="guide-card">
+
+            <div class="guide-thumbnail">
+
+                <span class="material-symbols-rounded">
+                    bookmark
+                </span>
+
+            </div>
+
+            <div class="guide-info">
+
+                <h3>택시 호출하기</h3>
+
+            </div>
+
+        </a>
+
+
+        <a href="{% url 'guides:detail' 6 %}" class="guide-card">
+
+            <div class="guide-thumbnail">
+
+                <span class="material-symbols-rounded">
+                    bookmark
+                </span>
+
+            </div>
+
+            <div class="guide-info">
+
+                <h3>은행 송금하기</h3>
+
+            </div>
+
+        </a>
+
+
+        <a href="{% url 'guides:detail' 7 %}" class="guide-card">
+
+            <div class="guide-thumbnail">
+
+                <span class="material-symbols-rounded">
+                    bookmark
+                </span>
+
+            </div>
+
+            <div class="guide-info">
+
+                <h3>QR코드 사용하기</h3>
+
+            </div>
+
+        </a>
+
+
+        <a href="{% url 'guides:detail' 8 %}" class="guide-card">
+
+            <div class="guide-thumbnail">
+
+                <span class="material-symbols-rounded">
+                    bookmark
+                </span>
+
+            </div>
+
+            <div class="guide-info">
+
+                <h3>버스 예매하기</h3>
+
+            </div>
+
+        </a>
+
+    </section>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/save_guid.js' %}"></script>
+{% endblock %}

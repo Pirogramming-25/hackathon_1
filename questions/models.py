@@ -71,11 +71,22 @@ class Answer(models.Model):
         related_name="answers",
     )
     content = models.TextField()
+    is_accepted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["question"],
+                condition=models.Q(is_accepted=True),
+                name="unique_accepted_answer_per_question",
+            )
+        ]
+
     def __str__(self):
         return f"Answer({self.id}) - Question({self.question_id})"
+    
 
 
 class AnswerImage(models.Model):

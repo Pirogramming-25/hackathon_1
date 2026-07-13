@@ -1,31 +1,65 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block title %}홈 - 무엇이 궁금하신가요? | 똑디{% endblock %}
 
-<!-- home 전용 CSS 연결 -->
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/home.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="search-container">
-    <h1>무엇이 궁금하신가요?</h1>
-    
-    <!-- 검색창 영역 -->
-    <form action="#" method="GET" class="search-box">
-        <span class="material-symbols-rounded search-icon-left">add</span>
-        <input type="text" name="q" class="search-input" placeholder="궁금한 것을 입력해주세요 (예: 카카오톡 증명서 발급)">
-        <button type="submit" style="background:none; border:none; padding:0;">
-            <span class="material-symbols-rounded search-icon-right" style="font-size: 32px;">search</span>
-        </button>
+{# base.html 의 네비게이션에서 현재 위치를 표시하려면 이 값을 view에서 context로 넘겨주세요 #}
+{# active_nav = 'home' #}
+
+<section class="home-hero">
+  <div class="page-wrap">
+
+    <h1 class="text-h1 home-hero__title">무엇이 궁금하신가요?</h1>
+
+    <form action="{% url 'guides:list' %}" method="get" class="search-box" id="searchForm">
+      <button type="button"
+              class="search-box__plus"
+              id="quickAskBtn"
+              aria-label="질문 바로 등록하기"
+              title="질문 바로 등록하기">
+        <span class="material-symbols-rounded">add</span>
+      </button>
+
+      <input type="text"
+             name="q"
+             id="searchInput"
+             class="search-box__input"
+             placeholder="예: 카카오톡 인증서 어떻게 받아요?"
+             autocomplete="off">
+
+      <button type="submit" class="search-box__submit" aria-label="검색하기">
+        <span class="material-symbols-rounded">search</span>
+      </button>
     </form>
 
-    <!-- 하단 안내 문구 -->
-    <div class="search-guide">
-        <h2>검색이 막막하신가요?</h2>
-        <p>이렇게 입력해보세요.</p>
-        <br>
-        <p><strong>- 어디에서? :</strong> 정부 24, 카카오톡</p>
-        <p><strong>- 무엇을? :</strong> 예약, 증명서 발급</p>
+    <div class="search-hint card">
+      <p class="text-body search-hint__title">검색이 막막하신가요?</p>
+      <p class="text-body search-hint__desc">이렇게 입력해보세요.</p>
+
+      <div class="search-hint__examples">
+        <button type="button" class="hint-chip" data-fill="정부24 어디에서 로그인해요?">
+          <span class="text-small">어디에서?</span> 정부24, 카카오톡
+        </button>
+        <button type="button" class="hint-chip" data-fill="카카오톡에서 증명서 발급 어떻게 해요?">
+          <span class="text-small">무엇을?</span> 예약, 증명서 발급
+        </button>
+      </div>
     </div>
-</div>
-{% endblock content %}
+
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/home.js' %}"></script>
+{# quickAskBtn 이 로그인 여부에 따라 다른 곳으로 이동해야 하므로, 아래 값을 view에서 내려주세요 #}
+<script>
+  window.DDOKDI_IS_AUTHENTICATED = {{ user.is_authenticated|yesno:"true,false" }};
+  window.DDOKDI_LOGIN_URL = "{% url 'accounts:login' %}";
+  window.DDOKDI_QUESTION_CREATE_URL = "{% url 'questions:create' %}";
+</script>
+{% endblock %}

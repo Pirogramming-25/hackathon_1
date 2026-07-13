@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -10,6 +10,7 @@ from .serializers import (
     SignupSerializer,
     UIModeSerializer,
     UserSerializer,
+    UserUpdateSerializer,
 )
 
 
@@ -144,6 +145,31 @@ class UserMeView(APIView):
             True,
             "내 정보 조회가 완료되었습니다.",
             UserSerializer(request.user).data,
+        )
+
+    def patch(self, request):
+        serializer = UserUpdateSerializer(
+            request.user,
+            data=request.data,
+            partial=True,
+        )
+        if not serializer.is_valid():
+            return api_response(
+                False,
+                "내 정보 수정에 실패했습니다.",
+                serializer.errors,
+                status.HTTP_400_BAD_REQUEST,
+            )
+
+        password_will_change = bool(serializer.validated_data.get("new_password"))
+        user = serializer.save()
+        if password_will_change:
+            update_session_auth_hash(request, user)
+
+        return api_response(
+            True,
+            "내 정보가 수정되었습니다.",
+            UserSerializer(user).data,
         )
 
 

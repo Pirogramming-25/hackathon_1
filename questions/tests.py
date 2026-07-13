@@ -1,10 +1,13 @@
-
+import os
+import tempfile
 from io import BytesIO
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db import IntegrityError
-from django.test import TestCase
+from django.db import IntegrityError, transaction
+from django.test import TestCase, override_settings
+
 from PIL import Image
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -83,6 +86,65 @@ class QuestionModelTests(TestCase):
                 question=question, image=make_image("b.png"), display_order=1
             )
 
+class ImageFileDeleteTests(TestCase):
+    def setUp(self):
+        self.temp_media_root = tempfile.mkdtemp()
+        self.override = override_settings(
+            MEDIA_ROOT=self.temp_media_root
+        )
+        self.override.enable()
+
+        self.user = User.objects.create_user(
+            username="image_user",
+            email="image_user@test.com",
+            password="pass1234",
+        )
+
+        self.question = Question.objects.create(
+            author=self.user,
+            title="이미지 삭제 테스트",
+            content="내용",
+            category="LIFE",
+        )
+
+    def tearDown(self):
+        self.override.disable()
+
+    def test_question_image_file_deleted_with_database_record(self):
+        question_image = QuestionImage.objects.create(
+            question=self.question,
+            image=make_image("question-delete.png"),
+            display_order=1,
+        )
+
+        image_path = question_image.image.path
+        self.assertTrue(os.path.exists(image_path))
+
+        with self.captureOnCommitCallbacks(execute=True):
+            question_image.delete()
+
+        self.assertFalse(os.path.exists(image_path))
+
+    def test_answer_image_file_deleted_with_database_record(self):
+        answer = Answer.objects.create(
+            question=self.question,
+            author=self.user,
+            content="답변",
+        )
+
+        answer_image = AnswerImage.objects.create(
+            answer=answer,
+            image=make_image("answer-delete.png"),
+            display_order=1,
+        )
+
+        image_path = answer_image.image.path
+        self.assertTrue(os.path.exists(image_path))
+
+        with self.captureOnCommitCallbacks(execute=True):
+            answer_image.delete()
+
+        self.assertFalse(os.path.exists(image_path))
 
 # =========================================================
 # 질문 API 테스트
@@ -118,6 +180,33 @@ class QuestionAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(response.data["success"])
         self.assertEqual(response.data["data"]["title"], "새 질문")
+
+    def test_create_question_rolls_back_when_image_save_fails(self):
+        self.client.force_authenticate(user=self.author)
+        question_count_before = Question.objects.count()
+
+        payload = {
+            "title": "롤백 테스트 질문",
+            "content": "내용",
+            "category": "LIFE",
+            "images": [make_image("rollback-question.png")],
+        }
+
+        with patch(
+            "questions.serializers.QuestionCreateUpdateSerializer._save_images",
+        side_effect=RuntimeError("이미지 저장 실패"),
+        ):
+            with self.assertRaises(RuntimeError):
+                self.client.post(
+                    "/api/questions/",
+                    payload,
+                    format="multipart",
+                )
+
+        self.assertEqual(
+            Question.objects.count(),
+            question_count_before,
+        )
 
     def test_create_question_with_6_images_fails(self):
         self.client.force_authenticate(user=self.author)
@@ -218,6 +307,7 @@ class QuestionAPITests(APITestCase):
         self.assertEqual(self.question.images.count(), 1)
 
 
+
 # =========================================================
 # 답변 API 테스트
 # =========================================================
@@ -247,6 +337,31 @@ class AnswerAPITests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(response.data["success"])
+
+    def test_create_answer_rolls_back_when_image_save_fails(self):
+        self.client.force_authenticate(user=self.other)
+        answer_count_before = Answer.objects.count()
+
+        payload = {
+            "content": "롤백 테스트 답변",
+            "images": [make_image("rollback-answer.png")],
+        }
+
+        with patch(
+            "questions.serializers.AnswerCreateUpdateSerializer._save_images",
+            side_effect=RuntimeError("이미지 저장 실패"),
+        ):
+            with self.assertRaises(RuntimeError):
+                self.client.post(
+                    f"/api/questions/{self.question.id}/answers/",
+                    payload,
+                    format="multipart",
+                )
+
+        self.assertEqual(
+            Answer.objects.count(),
+            answer_count_before,
+        )
 
     def test_create_answer_with_5_images_fails(self):
         self.client.force_authenticate(user=self.other)
@@ -344,6 +459,72 @@ class AnswerAPITests(APITestCase):
             f"/api/questions/{self.question.id}/answers/", payload, format="multipart"
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_question_author_can_accept_answer(self):
+        self.client.force_authenticate(user=self.question_author)
+        response = self.client.patch(f"/api/answers/{self.answer.id}/accept/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.answer.refresh_from_db()
+        self.assertTrue(self.answer.is_accepted)
+
+    def test_non_question_author_cannot_accept_answer(self):
+        self.client.force_authenticate(user=self.other)
+        response = self.client.patch(f"/api/answers/{self.answer.id}/accept/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_accepting_answer_does_not_change_question_status(self):
+        self.client.force_authenticate(user=self.question_author)
+        self.client.patch(f"/api/answers/{self.answer.id}/accept/")
+        self.question.refresh_from_db()
+        self.assertEqual(self.question.status, Question.Status.WAITING)
+
+    def test_accepting_new_answer_unaccepts_previous(self):
+        second_answer = Answer.objects.create(
+            question=self.question, author=self.other, content="두 번째 답변"
+        )
+        self.client.force_authenticate(user=self.question_author)
+
+        self.client.patch(f"/api/answers/{self.answer.id}/accept/")
+        self.client.patch(f"/api/answers/{second_answer.id}/accept/")
+
+        self.answer.refresh_from_db()
+        second_answer.refresh_from_db()
+        self.assertFalse(self.answer.is_accepted)
+        self.assertTrue(second_answer.is_accepted)
+
+    def test_accepted_answer_cannot_be_updated(self):
+        self.answer.is_accepted = True
+        self.answer.save(update_fields=["is_accepted"])
+
+        self.client.force_authenticate(user=self.answer_author)
+        response = self.client.patch(
+            f"/api/answers/{self.answer.id}/", {"content": "수정 시도"}
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_accepted_answer_cannot_be_deleted(self):
+        self.answer.is_accepted = True
+        self.answer.save(update_fields=["is_accepted"])
+
+        self.client.force_authenticate(user=self.answer_author)
+        response = self.client.delete(f"/api/answers/{self.answer.id}/")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue(Answer.objects.filter(id=self.answer.id).exists())    
+
+    def test_database_rejects_multiple_accepted_answers_for_same_question(self):
+        # 첫 번째 답변을 선택 상태로 설정
+        self.answer.is_accepted = True
+        self.answer.save(update_fields=["is_accepted"])
+
+        # 같은 질문에 선택된 답변을 하나 더 만들면 DB에서 막아야 함
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                Answer.objects.create(
+                    question=self.question,
+                    author=self.other,
+                    content="두 번째 선택 답변",
+                    is_accepted=True,
+                )    
     
     def test_update_answer_replaces_images(self):
         self.client.force_authenticate(user=self.answer_author)
@@ -397,8 +578,12 @@ class GuideDataAPITests(APITestCase):
             author=self.answer_author, title="t", content="c", category="MEDICAL"
         )
         self.answer = Answer.objects.create(
-            question=self.question, author=self.answer_author, content="답변 내용"
+            question=self.question,
+            author=self.answer_author,
+            content="답변 내용",
+            is_accepted=True,
         )
+
         AnswerImage.objects.create(
             answer=self.answer, image=make_image("second.png"), display_order=2
         )
@@ -427,6 +612,14 @@ class GuideDataAPITests(APITestCase):
         response = self.client.get(f"/api/answers/{self.answer.id}/guide-data/")
         orders = [img["display_order"] for img in response.data["data"]["images"]]
         self.assertEqual(orders, [1, 2])
+
+    def test_guide_data_blocked_for_unaccepted_answer(self):
+        unaccepted_answer = Answer.objects.create(
+            question=self.question, author=self.answer_author, content="미선택 답변"
+        )
+        self.client.force_authenticate(user=self.answer_author)
+        response = self.client.get(f"/api/answers/{unaccepted_answer.id}/guide-data/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)    
 
 class MyPageAPITests(APITestCase):
     def setUp(self):
@@ -462,3 +655,23 @@ class MyPageAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         contents = [a["content"] for a in response.data["data"]["results"]]
         self.assertEqual(contents, ["내 답변"])
+    
+    def test_my_answer_list_returns_false_for_unaccepted_answer(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get("/api/users/me/answers/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        result = response.data["data"]["results"][0]
+        self.assertIn("is_accepted", result)
+        self.assertFalse(result["is_accepted"])
+
+    def test_my_answer_list_returns_true_for_accepted_answer(self):
+        self.my_answer.is_accepted = True
+        self.my_answer.save(update_fields=["is_accepted"])
+
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get("/api/users/me/answers/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        result = response.data["data"]["results"][0]
+        self.assertEqual(result["id"], self.my_answer.id)
+        self.assertTrue(result["is_accepted"])

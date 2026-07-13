@@ -45,6 +45,7 @@ class AnswerSerializer(serializers.ModelSerializer):
             "id",
             "author",
             "content",
+            "is_accepted",
             "images",
             "created_at",
             "updated_at",
@@ -148,10 +149,20 @@ class QuestionCreateUpdateSerializer(serializers.ModelSerializer):
         images = validated_data.pop("images", [])
         descriptions = validated_data.pop("image_descriptions", [])
         author = self.context["request"].user
-        question = Question.objects.create(author=author, **validated_data)
-        self._save_images(question, images, descriptions)
-        return question
 
+        with transaction.atomic():
+            question = Question.objects.create(
+                author=author,
+                **validated_data,
+            )
+            self._save_images(
+                question,
+                images,
+                descriptions,
+            )
+
+        return question
+    
     def update(self, instance, validated_data):
         images = validated_data.pop("images", None)
         descriptions = validated_data.pop("image_descriptions", [])
@@ -225,10 +236,19 @@ class AnswerCreateUpdateSerializer(serializers.ModelSerializer):
         descriptions = validated_data.pop("image_descriptions", [])
         author = self.context["request"].user
         question = self.context["question"]
-        answer = Answer.objects.create(
-            author=author, question=question, **validated_data
-        )
-        self._save_images(answer, images, descriptions)
+
+        with transaction.atomic():
+            answer = Answer.objects.create(
+                author=author,
+                question=question,
+                **validated_data,
+            )
+            self._save_images(
+                answer,
+                images,
+                descriptions,
+            )
+
         return answer
 
     def update(self, instance, validated_data):
@@ -290,5 +310,6 @@ class MyAnswerListSerializer(serializers.ModelSerializer):
             "question_id",
             "question_title",
             "content",
+            "is_accepted",
             "created_at",
         ]

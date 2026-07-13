@@ -4,9 +4,15 @@ from rest_framework import generics, mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django.db import transaction
 
-from .models import Answer, Question, QuestionImage
-from .permissions import IsAnswerAuthor, IsAnswerAuthorForGuideData, IsQuestionAuthor
+from .models import Answer, AnswerImage, Question, QuestionImage
+from .permissions import (
+    IsAnswerAuthor,
+    IsAnswerAuthorForGuideData,
+    IsQuestionAuthor,
+    IsQuestionAuthorOfAnswer,
+)
 from .serializers import (
     AnswerCreateUpdateSerializer,
     AnswerSerializer,
@@ -38,6 +44,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Question.objects.select_related("author").order_by("-created_at")
+
         if self.action == "list":
             queryset = queryset.annotate(
                 answer_count_cache=Count("answers")
@@ -47,6 +54,31 @@ class QuestionViewSet(viewsets.ModelViewSet):
                     queryset=QuestionImage.objects.order_by("display_order"),
                 )
             )
+
+        elif self.action == "retrieve":
+            queryset = queryset.prefetch_related(
+                Prefetch(
+                    "images",
+                    queryset=QuestionImage.objects.order_by("display_order"),
+                ),
+                Prefetch(
+                    "answers",
+                    queryset=(
+                        Answer.objects
+                        .select_related("author")
+                        .prefetch_related(
+                            Prefetch(
+                                "images",
+                                queryset=AnswerImage.objects.order_by(
+                                    "display_order"
+                                ),
+                            )
+                        )
+                        .order_by("created_at")
+                    ),
+                ),
+            )
+
         return queryset
 
     def get_serializer_class(self):
@@ -160,6 +192,13 @@ class AnswerViewSet(
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
+
+        if instance.is_accepted:
+            return error_response(
+                "채택된 답변은 수정할 수 없습니다.",
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+
         serializer = self.get_serializer(
             instance, data=request.data, partial=partial, context={"request": request}
         )
@@ -172,6 +211,13 @@ class AnswerViewSet(
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
+
+        if instance.is_accepted:
+            return error_response(
+                "채택된 답변은 삭제할 수 없습니다.",
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+
         instance.delete()
         return success_response(None, "답변이 삭제되었습니다.")
 
@@ -186,12 +232,63 @@ class AnswerViewSet(
         serializer = GuideDataSerializer(answer, context={"request": request})
         return success_response(serializer.data, "설명서 작성용 데이터를 조회했습니다.")
     
+    @action(
+        detail=True,
+        methods=["patch"],
+        url_path="accept",
+        permission_classes=[IsAuthenticated, IsQuestionAuthorOfAnswer],
+    )
+    def accept(self, request, pk=None):
+        answer = self.get_object()
+
+        with transaction.atomic():
+            # 같은 질문의 선택 요청을 순차 처리
+            Question.objects.select_for_update().get(
+                pk=answer.question_id
+            )
+
+            # 기존 선택 답변 해제
+            Answer.objects.filter(
+                question_id=answer.question_id,
+                is_accepted=True,
+            ).exclude(
+                pk=answer.pk
+            ).update(
+                is_accepted=False
+            )
+
+            # 현재 답변 선택
+            answer.is_accepted = True
+            answer.save(update_fields=["is_accepted"])
+
+        result = AnswerSerializer(
+            answer,
+            context={"request": request},
+        ).data
+
+        return success_response(
+            result,
+            "설명서 작성용 답변으로 선택되었습니다.",
+        )
+
 class MyQuestionListView(generics.ListAPIView):
     serializer_class = QuestionListSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Question.objects.filter(author=self.request.user).order_by("-created_at")
+        return (
+            Question.objects
+            .filter(author=self.request.user)
+            .select_related("author")
+            .annotate(answer_count_cache=Count("answers"))
+            .prefetch_related(
+                Prefetch(
+                    "images",
+                    queryset=QuestionImage.objects.order_by("display_order"),
+                )
+            )
+            .order_by("-created_at")
+        )
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -206,7 +303,12 @@ class MyAnswerListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Answer.objects.filter(author=self.request.user).order_by("-created_at")
+        return (
+            Answer.objects
+            .filter(author=self.request.user)
+            .select_related("question")
+            .order_by("-created_at")
+        )
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
