@@ -95,7 +95,7 @@ class FamilyRequestCreateView(APIView):
                 requester=requester,
                 status=FamilyRelation.Status.PENDING,
             )
-            status_code = status.HTTP_201_CREAED
+            status_code = status.HTTP_201_CREATED
 
         return success_response(
             FamilyRelationSerializer(relation, context={"request": request}).data,
