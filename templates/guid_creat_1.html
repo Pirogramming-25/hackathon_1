@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+설명서 작성
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/guid_create_1.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="guide-create-page">
+
+    <div class="page-header">
+        <h1>설명서 작성</h1>
+        <p>기본 정보를 입력한 후 화면 사진을 등록해주세요.</p>
+    </div>
+
+    <form class="guide-form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- 제목 -->
+        <div class="form-group">
+
+            <label for="title">
+                설명서 제목
+            </label>
+
+            <input
+                type="text"
+                id="title"
+                name="title"
+                placeholder="예) 카카오톡 증명서 발급하기"
+            >
+
+        </div>
+
+
+        <!-- 카테고리 -->
+        <div class="form-group">
+
+            <label for="category">
+                분야
+            </label>
+
+            <select id="category" name="category">
+
+                <option selected disabled>
+                    분야를 선택해주세요.
+                </option>
+
+                <option>금융</option>
+                <option>정부24</option>
+                <option>카카오톡</option>
+                <option>병원</option>
+                <option>교통</option>
+                <option>쇼핑</option>
+                <option>기타</option>
+
+            </select>
+
+        </div>
+
+
+        <!-- 공개범위 -->
+        <div class="form-group">
+
+            <label for="scope">
+                공개 범위
+            </label>
+
+            <select id="scope" name="scope">
+
+                <option selected>
+                    전체 공개
+                </option>
+
+                <option>
+                    나만 보기
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- 사진 업로드 -->
+
+        <div class="form-group">
+
+            <label>
+                화면 사진
+            </label>
+
+            <label for="imageInput" class="upload-box">
+
+                <span class="material-symbols-rounded upload-icon">
+                    add_photo_alternate
+                </span>
+
+                <h3>이미지를 추가해주세요.</h3>
+
+                <p>클릭하거나 파일을 드래그하여 업로드</p>
+
+                <small>최대 20장까지 업로드 가능합니다.</small>
+
+                <input
+                    type="file"
+                    id="imageInput"
+                    multiple
+                    accept="image/*"
+                    hidden
+                >
+
+            </label>
+
+        </div>
+
+
+        <!-- 미리보기 -->
+
+        <div id="previewArea" class="preview-area"></div>
+
+
+        <div class="submit-area">
+
+            <!-- 실제로는 guid_create_2로 넘어가면 됨 -->
+            <a href="{% url 'guides:create2' %}" class="next-btn">
+                다음 단계 →
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/guid_create_1.js' %}"></script>
+{% endblock %}
