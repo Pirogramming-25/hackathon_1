@@ -199,19 +199,38 @@ class AnswerViewSet(
         permission_classes=[IsAuthenticated, IsQuestionAuthorOfAnswer],
     )
     def accept(self, request, pk=None):
-        answer = self.get_object()  # IsQuestionAuthorOfAnswer 검증 포함
+        answer = self.get_object()
 
         with transaction.atomic():
-            Answer.objects.filter(
-                question=answer.question, is_accepted=True
-            ).exclude(pk=answer.pk).update(is_accepted=False)
+            # 같은 질문의 선택 요청을 순차 처리
+            Question.objects.select_for_update().get(
+                pk=answer.question_id
+            )
 
+            # 기존 선택 답변 해제
+            Answer.objects.filter(
+                question_id=answer.question_id,
+                is_accepted=True,
+            ).exclude(
+                pk=answer.pk
+            ).update(
+                is_accepted=False
+            )
+
+            # 현재 답변 선택
             answer.is_accepted = True
             answer.save(update_fields=["is_accepted"])
 
-        result = AnswerSerializer(answer, context={"request": request}).data
-        return success_response(result, "설명서 작성용 답변으로 선택되었습니다.")
-    
+        result = AnswerSerializer(
+            answer,
+            context={"request": request},
+        ).data
+
+        return success_response(
+            result,
+            "설명서 작성용 답변으로 선택되었습니다.",
+        )
+
 class MyQuestionListView(generics.ListAPIView):
     serializer_class = QuestionListSerializer
     permission_classes = [IsAuthenticated]

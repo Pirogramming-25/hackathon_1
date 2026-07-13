@@ -3,7 +3,7 @@ from io import BytesIO
 
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.test import TestCase
 from PIL import Image
 from rest_framework import status
@@ -376,6 +376,21 @@ class AnswerAPITests(APITestCase):
         second_answer.refresh_from_db()
         self.assertFalse(self.answer.is_accepted)
         self.assertTrue(second_answer.is_accepted)    
+
+    def test_database_rejects_multiple_accepted_answers_for_same_question(self):
+        # 첫 번째 답변을 선택 상태로 설정
+        self.answer.is_accepted = True
+        self.answer.save(update_fields=["is_accepted"])
+
+        # 같은 질문에 선택된 답변을 하나 더 만들면 DB에서 막아야 함
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                Answer.objects.create(
+                    question=self.question,
+                    author=self.other,
+                    content="두 번째 선택 답변",
+                    is_accepted=True,
+                )    
     
     def test_update_answer_replaces_images(self):
         self.client.force_authenticate(user=self.answer_author)
