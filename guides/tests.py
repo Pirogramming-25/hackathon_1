@@ -53,7 +53,7 @@ class GuideAPITests(APITestCase):
         }
         response = self.client.post(url, payload)
         
-        self.assertEqual(response.status_code, status.HTTP_201_createED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(response.data.get("success"))
         self.assertEqual(Guide.objects.filter(title="승격된 설명서").count(), 1)
 
@@ -94,7 +94,7 @@ class GuideAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Guide.objects.filter(title="공격").count(), 0)
 
-    def test_guidee_search_and_filter(self):
+    def test_guide_search_and_filter(self):
         Guide.objects.all().delete() 
         Guide.objects.create(author=self.user, title="금융 가이드", category="FINANCE", visibility="PUBLIC")
         Guide.objects.create(author=self.user, title="생활 가이드", category="LIFE", visibility="PUBLIC")

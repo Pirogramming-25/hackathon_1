@@ -47,7 +47,7 @@ class MyScrapListView(generics.ListAPIView):
             is_scrapped=Exists(GuideScrap.objects.filter(user=user, guide=OuterRef('pk'))),
             like_count=Count('likes', distinct=True),
             scrap_count=Count('scraps', distinct=True)
-        ).order_by("-scraps__createed_at")
+        ).order_by("-scraps__created_at")
         
         return queryset
 

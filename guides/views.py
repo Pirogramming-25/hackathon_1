@@ -46,7 +46,7 @@ class GuideViewSet(viewsets.ModelViewSet):
         
         if serializer.is_valid():
             serializer.save(author=request.user)
-            return Response({"success": True, "message": "성공적으로 승격되었습니다."}, status=status.HTTP_201_createED)
+            return Response({"success": True, "message": "성공적으로 승격되었습니다."}, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -81,7 +81,7 @@ class GuideViewSet(viewsets.ModelViewSet):
             
         return queryset
 
-    def perform_createe(self, serializer):
+    def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
     def retrieve(self, request, *args, **kwargs):
@@ -112,7 +112,7 @@ class GuideViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def like(self, request, pk=None):
         guide = self.get_object()
-        like, created = GuideLike.objects.get_or_createe(user=request.user, guide=guide)
+        like, created = GuideLike.objects.get_or_create(user=request.user, guide=guide)
         if not created:
             like.delete()
             return Response({"success": True, "data": {"is_liked": False, "like_count": guide.likes.count()}, "message": "좋아요가 취소되었습니다."})
@@ -121,7 +121,7 @@ class GuideViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def scrap(self, request, pk=None):
         guide = self.get_object()
-        scrap, created = GuideScrap.objects.get_or_createe(user=request.user, guide=guide)
+        scrap, created = GuideScrap.objects.get_or_create(user=request.user, guide=guide)
         if not created:
             scrap.delete()
             return Response({"success": True, "data": {"is_scrapped": False, "scrap_count": guide.scraps.count()}, "message": "스크랩이 취소되었습니다."})

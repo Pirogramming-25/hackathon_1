@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Guide',
             fields=[
-                ('id', models.BigAutoField(auto_createed=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=200)),
                 ('category', models.CharField(choices=[('GOVERNMENT', '정부'), ('FINANCE', '금융'), ('MEDICAL', '의료'), ('LIFE', '생활'), ('ETC', '기타')], max_length=20)),
                 ('visibility', models.CharField(choices=[('PUBLIC', '공개'), ('PRIVATE', '비공개')], default='PUBLIC', max_length=10)),
@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='GuideScrap',
             fields=[
-                ('id', models.BigAutoField(auto_createed=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_d=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('guide', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='scraps', to='guides.guide')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='GuideLike',
             fields=[
-                ('id', models.BigAutoField(auto_createed=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('guide', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='likes', to='guides.guide')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='GuideImage',
             fields=[
-                ('id', models.BigAutoField(auto_createed=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('image', models.ImageField(upload_to='guides/')),
                 ('description', models.TextField(blank=True, help_text='단계별 설명')),
                 ('is_baked', models.BooleanField(default=False, help_text='이미지 가공 여부')),
@@ -64,14 +64,14 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='guidescrap',
-            constraint=models.UniqueConstraint(fields=('user', 'guide'), name='unique_guidee_scrap'),
+            constraint=models.UniqueConstraint(fields=('user', 'guide'), name='unique_guide_scrap'),
         ),
         migrations.AddConstraint(
             model_name='guidelike',
-            constraint=models.UniqueConstraint(fields=('user', 'guide'), name='unique_guidee_like'),
+            constraint=models.UniqueConstraint(fields=('user', 'guide'), name='unique_guide_like'),
         ),
         migrations.AddConstraint(
             model_name='guideimage',
-            constraint=models.UniqueConstraint(fields=('guide', 'display_order'), name='unique_guidee_image_order'),
+            constraint=models.UniqueConstraint(fields=('guide', 'display_order'), name='unique_guide_image_order'),
         ),
     ]

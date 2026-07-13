@@ -1,4 +1,4 @@
-// my_createe.js
+// my_create.js
 
 document.addEventListener("DOMContentLoaded", () => {
 

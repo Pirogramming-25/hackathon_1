@@ -39,7 +39,7 @@ class GuideImage(models.Model):
     class Meta:
         ordering = ['display_order']
         constraints = [
-            models.UniqueConstraint(fields=['guide', 'display_order'], name='unique_guidee_image_order')
+            models.UniqueConstraint(fields=['guide', 'display_order'], name='unique_guide_image_order')
         ]
 
 class GuideLike(models.Model):
@@ -48,7 +48,7 @@ class GuideLike(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=['user', 'guide'], name='unique_guidee_like')]
+        constraints = [models.UniqueConstraint(fields=['user', 'guide'], name='unique_guide_like')]
 
 class GuideScrap(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -56,4 +56,4 @@ class GuideScrap(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=['user', 'guide'], name='unique_guidee_scrap')]
+        constraints = [models.UniqueConstraint(fields=['user', 'guide'], name='unique_guide_scrap')]

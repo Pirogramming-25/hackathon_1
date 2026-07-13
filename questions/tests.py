@@ -173,15 +173,15 @@ class QuestionAPITests(APITestCase):
         self.assertTrue(response.data["success"])
         self.assertEqual(response.data["data"]["count"], 1)
 
-    def test_createe_question_success(self):
+    def test_create_question_success(self):
         self.client.force_authenticate(user=self.author)
         payload = {"title": "새 질문", "content": "내용", "category": "MEDICAL"}
         response = self.client.post("/api/questions/", payload)
-        self.assertEqual(response.status_code, status.HTTP_201_createED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(response.data["success"])
         self.assertEqual(response.data["data"]["title"], "새 질문")
 
-    def test_createe_question_rolls_back_when_image_save_fails(self):
+    def test_create_question_rolls_back_when_image_save_fails(self):
         self.client.force_authenticate(user=self.author)
         question_count_before = Question.objects.count()
 
@@ -208,7 +208,7 @@ class QuestionAPITests(APITestCase):
             question_count_before,
         )
 
-    def test_createe_question_with_6_images_fails(self):
+    def test_create_question_with_6_images_fails(self):
         self.client.force_authenticate(user=self.author)
         payload = {
             "title": "새 질문",
@@ -220,7 +220,7 @@ class QuestionAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(response.data["success"])
 
-    def test_createe_question_with_invalid_extension_fails(self):
+    def test_create_question_with_invalid_extension_fails(self):
         self.client.force_authenticate(user=self.author)
         payload = {
             "title": "새 질문",
@@ -330,15 +330,15 @@ class AnswerAPITests(APITestCase):
             question=self.question, author=self.answer_author, content="기존 답변"
         )
 
-    def test_createe_answer_success(self):
+    def test_create_answer_success(self):
         self.client.force_authenticate(user=self.other)
         response = self.client.post(
             f"/api/questions/{self.question.id}/answers/", {"content": "새 답변"}
         )
-        self.assertEqual(response.status_code, status.HTTP_201_createED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(response.data["success"])
 
-    def test_createe_answer_rolls_back_when_image_save_fails(self):
+    def test_create_answer_rolls_back_when_image_save_fails(self):
         self.client.force_authenticate(user=self.other)
         answer_count_before = Answer.objects.count()
 
@@ -363,7 +363,7 @@ class AnswerAPITests(APITestCase):
             answer_count_before,
         )
 
-    def test_createe_answer_with_5_images_fails(self):
+    def test_create_answer_with_5_images_fails(self):
         self.client.force_authenticate(user=self.other)
         payload = {
             "content": "새 답변",
@@ -375,7 +375,7 @@ class AnswerAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(response.data["success"])
 
-    def test_createe_answer_with_invalid_extension_fails(self):
+    def test_create_answer_with_invalid_extension_fails(self):
         self.client.force_authenticate(user=self.other)
         payload = {
             "content": "새 답변",
@@ -407,7 +407,7 @@ class AnswerAPITests(APITestCase):
         response = self.client.post(
             f"/api/questions/{self.question.id}/answers/", {"content": "새 답변"}
         )
-        self.assertEqual(response.status_code, status.HTTP_201_createED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_other_user_cannot_update_answer(self):
         self.client.force_authenticate(user=self.other)
@@ -443,7 +443,7 @@ class AnswerAPITests(APITestCase):
         response = self.client.post(
             f"/api/questions/{self.question.id}/answers/", payload, format="multipart"
         )
-        self.assertEqual(response.status_code, status.HTTP_201_createED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         images = response.data["data"]["images"]
         self.assertEqual(images[0]["description"], "1단계 설명")
         self.assertEqual(images[1]["description"], "2단계 설명")
@@ -591,13 +591,13 @@ class GuideDataAPITests(APITestCase):
             answer=self.answer, image=make_image("first.png"), display_order=1
         )
 
-    def test_author_can_fetch_guidee_data(self):
+    def test_author_can_fetch_guide_data(self):
         self.client.force_authenticate(user=self.answer_author)
         response = self.client.get(f"/api/answers/{self.answer.id}/guide-data/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(response.data["success"])
 
-    def test_other_user_cannot_fetch_guidee_data(self):
+    def test_other_user_cannot_fetch_guide_data(self):
         self.client.force_authenticate(user=self.other)
         response = self.client.get(f"/api/answers/{self.answer.id}/guide-data/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -613,7 +613,7 @@ class GuideDataAPITests(APITestCase):
         orders = [img["display_order"] for img in response.data["data"]["images"]]
         self.assertEqual(orders, [1, 2])
 
-    def test_guidee_data_blocked_for_unaccepted_answer(self):
+    def test_guide_data_blocked_for_unaccepted_answer(self):
         unaccepted_answer = Answer.objects.create(
             question=self.question, author=self.answer_author, content="미선택 답변"
         )
