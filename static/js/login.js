@@ -15,8 +15,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-    // 로그인 폼 유효성 검사
-    loginForm.addEventListener("submit", function (event) {
+    function getCookie(name) {
+        const cookies = document.cookie ? document.cookie.split(";") : [];
+
+        for (const cookie of cookies) {
+            const trimmedCookie = cookie.trim();
+
+            if (trimmedCookie.startsWith(name + "=")) {
+                return decodeURIComponent(trimmedCookie.substring(name.length + 1));
+            }
+        }
+
+        return "";
+    }
+
+
+
+    // 로그인 폼 유효성 검사 및 API 요청
+    loginForm.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
 
 
         const username = usernameInput.value.trim();
@@ -26,8 +44,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         if (username === "") {
-
-            event.preventDefault();
 
             alert("아이디를 입력해주세요.");
 
@@ -41,14 +57,40 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (password === "") {
 
-            event.preventDefault();
-
             alert("비밀번호를 입력해주세요.");
 
             passwordInput.focus();
 
             return;
 
+        }
+
+
+        try {
+            const response = await fetch("/api/auth/login/", {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken"),
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                alert(result.message || "로그인에 실패했습니다.");
+                return;
+            }
+
+            const nextUrl = new URLSearchParams(window.location.search).get("next");
+            window.location.href = nextUrl || "/";
+        } catch (error) {
+            alert("로그인 요청 중 오류가 발생했습니다.");
         }
 
 
