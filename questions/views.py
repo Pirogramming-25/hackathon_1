@@ -4,9 +4,15 @@ from rest_framework import generics, mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django.db import transaction
 
 from .models import Answer, Question, QuestionImage
-from .permissions import IsAnswerAuthor, IsAnswerAuthorForGuideData, IsQuestionAuthor
+from .permissions import (
+    IsAnswerAuthor,
+    IsAnswerAuthorForGuideData,
+    IsQuestionAuthor,
+    IsQuestionAuthorOfAnswer,
+)
 from .serializers import (
     AnswerCreateUpdateSerializer,
     AnswerSerializer,
@@ -185,6 +191,26 @@ class AnswerViewSet(
         answer = self.get_object()
         serializer = GuideDataSerializer(answer, context={"request": request})
         return success_response(serializer.data, "설명서 작성용 데이터를 조회했습니다.")
+    
+    @action(
+        detail=True,
+        methods=["patch"],
+        url_path="accept",
+        permission_classes=[IsAuthenticated, IsQuestionAuthorOfAnswer],
+    )
+    def accept(self, request, pk=None):
+        answer = self.get_object()  # IsQuestionAuthorOfAnswer 검증 포함
+
+        with transaction.atomic():
+            Answer.objects.filter(
+                question=answer.question, is_accepted=True
+            ).exclude(pk=answer.pk).update(is_accepted=False)
+
+            answer.is_accepted = True
+            answer.save(update_fields=["is_accepted"])
+
+        result = AnswerSerializer(answer, context={"request": request}).data
+        return success_response(result, "설명서 작성용 답변으로 선택되었습니다.")
     
 class MyQuestionListView(generics.ListAPIView):
     serializer_class = QuestionListSerializer

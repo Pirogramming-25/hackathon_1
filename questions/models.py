@@ -71,6 +71,7 @@ class Answer(models.Model):
         related_name="answers",
     )
     content = models.TextField()
+    is_accepted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
