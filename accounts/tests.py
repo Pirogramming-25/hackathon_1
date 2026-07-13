@@ -18,6 +18,13 @@ class AuthAPITestCase(TestCase):
             name="김민서",
             birth_date="2000-01-01",
         )
+        self.other_user = User.objects.create_user(
+            username="other",
+            email="other@example.com",
+            password="OtherStrongPass123!",
+            name="다른유저",
+            birth_date="2002-02-02",
+        )
 
     def test_check_username(self):
         response = self.client.get(
@@ -129,23 +136,94 @@ class AuthAPITestCase(TestCase):
         self.assertEqual(response.data["data"]["username"], "minseo")
         self.assertNotIn("password", response.data["data"])
 
-    def test_me_does_not_allow_patch(self):
+    def test_update_me(self):
         self.client.force_login(self.user)
 
         response = self.client.patch(
             reverse("users:me"),
-            {"name": "수정된이름"},
+            {
+                "email": "updated@example.com",
+                "name": "수정된이름",
+                "birth_date": "2000-12-31",
+            },
             format="json",
         )
         self.user.refresh_from_db()
 
-        self.assertEqual(
-            response.status_code,
-            status.HTTP_405_METHOD_NOT_ALLOWED,
-        )
-        self.assertFalse(response.data["success"])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["success"])
         self.assertEqual(self.user.username, "minseo")
-        self.assertEqual(self.user.name, "김민서")
+        self.assertEqual(self.user.email, "updated@example.com")
+        self.assertEqual(self.user.name, "수정된이름")
+        self.assertEqual(str(self.user.birth_date), "2000-12-31")
+        self.assertNotIn("password", response.data["data"])
+
+    def test_update_me_rejects_username_change(self):
+        self.client.force_login(self.user)
+
+        response = self.client.patch(
+            reverse("users:me"),
+            {"username": "changed"},
+            format="json",
+        )
+        self.user.refresh_from_db()
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(response.data["success"])
+        self.assertIn("username", response.data["data"])
+        self.assertEqual(self.user.username, "minseo")
+
+    def test_update_me_rejects_duplicate_email(self):
+        self.client.force_login(self.user)
+
+        response = self.client.patch(
+            reverse("users:me"),
+            {"email": "other@example.com"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(response.data["success"])
+        self.assertIn("email", response.data["data"])
+
+    def test_update_me_changes_password(self):
+        self.client.force_login(self.user)
+
+        response = self.client.patch(
+            reverse("users:me"),
+            {
+                "current_password": "StrongPass123!",
+                "new_password": "ChangedStrongPass123!",
+                "new_password_confirm": "ChangedStrongPass123!",
+            },
+            format="json",
+        )
+        self.user.refresh_from_db()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["success"])
+        self.assertFalse(self.user.check_password("StrongPass123!"))
+        self.assertTrue(self.user.check_password("ChangedStrongPass123!"))
+
+        me_response = self.client.get(reverse("users:me"))
+        self.assertEqual(me_response.status_code, status.HTTP_200_OK)
+
+    def test_update_me_rejects_wrong_current_password(self):
+        self.client.force_login(self.user)
+
+        response = self.client.patch(
+            reverse("users:me"),
+            {
+                "current_password": "wrong-password",
+                "new_password": "ChangedStrongPass123!",
+                "new_password_confirm": "ChangedStrongPass123!",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(response.data["success"])
+        self.assertIn("current_password", response.data["data"])
 
     def test_update_ui_mode(self):
         self.client.force_login(self.user)
