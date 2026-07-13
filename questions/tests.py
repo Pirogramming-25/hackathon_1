@@ -1,10 +1,12 @@
-
+import os
+import tempfile
 from io import BytesIO
 
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import IntegrityError, transaction
-from django.test import TestCase
+from django.test import TestCase, override_settings
+
 from PIL import Image
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -83,6 +85,65 @@ class QuestionModelTests(TestCase):
                 question=question, image=make_image("b.png"), display_order=1
             )
 
+class ImageFileDeleteTests(TestCase):
+    def setUp(self):
+        self.temp_media_root = tempfile.mkdtemp()
+        self.override = override_settings(
+            MEDIA_ROOT=self.temp_media_root
+        )
+        self.override.enable()
+
+        self.user = User.objects.create_user(
+            username="image_user",
+            email="image_user@test.com",
+            password="pass1234",
+        )
+
+        self.question = Question.objects.create(
+            author=self.user,
+            title="이미지 삭제 테스트",
+            content="내용",
+            category="LIFE",
+        )
+
+    def tearDown(self):
+        self.override.disable()
+
+    def test_question_image_file_deleted_with_database_record(self):
+        question_image = QuestionImage.objects.create(
+            question=self.question,
+            image=make_image("question-delete.png"),
+            display_order=1,
+        )
+
+        image_path = question_image.image.path
+        self.assertTrue(os.path.exists(image_path))
+
+        with self.captureOnCommitCallbacks(execute=True):
+            question_image.delete()
+
+        self.assertFalse(os.path.exists(image_path))
+
+    def test_answer_image_file_deleted_with_database_record(self):
+        answer = Answer.objects.create(
+            question=self.question,
+            author=self.user,
+            content="답변",
+        )
+
+        answer_image = AnswerImage.objects.create(
+            answer=answer,
+            image=make_image("answer-delete.png"),
+            display_order=1,
+        )
+
+        image_path = answer_image.image.path
+        self.assertTrue(os.path.exists(image_path))
+
+        with self.captureOnCommitCallbacks(execute=True):
+            answer_image.delete()
+
+        self.assertFalse(os.path.exists(image_path))
 
 # =========================================================
 # 질문 API 테스트

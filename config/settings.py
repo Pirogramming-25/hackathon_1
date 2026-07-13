@@ -59,7 +59,7 @@ INSTALLED_APPS = [
     # Local apps
     "accounts",
     "guides",
-    "questions",
+    "questions.apps.QuestionsConfig",
     "families",
 ]
 
