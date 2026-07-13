@@ -41,9 +41,11 @@ urlpatterns = [
     path("my-info/", TemplateView.as_view(template_name="myinfo.html"), name="my_info"),
     path(
         "family-connect/",
-        TemplateView.as_view(template_name="my_page.html"),
+        TemplateView.as_view(template_name="family_connect.html"),
         name="family_connect",
     ),
+
+    
     path("api/", index),
     path("admin/", admin.site.urls),
     path("api/health/", health_check),
