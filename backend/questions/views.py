@@ -10,6 +10,7 @@ from .models import Answer, Question
 from .permissions import IsAnswerAuthor, IsAnswerAuthorForGuideData, IsQuestionAuthor
 from .serializers import (
     AnswerCreateUpdateSerializer,
+    AnswerSerializer,
     GuideDataSerializer,
     MyAnswerListSerializer,
     QuestionCreateUpdateSerializer,
@@ -131,7 +132,6 @@ class QuestionViewSet(viewsets.ModelViewSet):
         if not serializer.is_valid():
             return error_response("입력값을 확인해주세요.", data=serializer.errors)
         answer = serializer.save()
-        from .serializers import AnswerSerializer
 
         result = AnswerSerializer(answer, context={"request": request}).data
         return success_response(result, "답변이 등록되었습니다.", status.HTTP_201_CREATED)
@@ -155,7 +155,6 @@ class AnswerViewSet(
         if not serializer.is_valid():
             return error_response("입력값을 확인해주세요.", data=serializer.errors)
         answer = serializer.save()
-        from .serializers import AnswerSerializer
 
         result = AnswerSerializer(answer, context={"request": request}).data
         return success_response(result, "답변이 수정되었습니다.")

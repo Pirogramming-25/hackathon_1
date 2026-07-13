@@ -21,6 +21,12 @@ def make_image(name="test.png"):
     buf.seek(0)
     return SimpleUploadedFile(name, buf.read(), content_type="image/png")
 
+def make_invalid_extension_file(name="test.gif"):
+    """확장자 검증 실패를 테스트하기 위한 파일 (PNG 데이터지만 .gif 확장자)."""
+    buf = BytesIO()
+    Image.new("RGB", (2, 2), color="red").save(buf, "PNG")
+    buf.seek(0)
+    return SimpleUploadedFile(name, buf.read(), content_type="image/gif")
 
 # =========================================================
 # 모델 테스트
@@ -125,6 +131,18 @@ class QuestionAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(response.data["success"])
 
+    def test_create_question_with_invalid_extension_fails(self):
+        self.client.force_authenticate(user=self.author)
+        payload = {
+            "title": "새 질문",
+            "content": "내용",
+            "category": "MEDICAL",
+            "images": [make_invalid_extension_file()],
+        }
+        response = self.client.post("/api/questions/", payload, format="multipart")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(response.data["success"])
+
     def test_other_user_cannot_update(self):
         self.client.force_authenticate(user=self.other)
         response = self.client.patch(
@@ -208,6 +226,18 @@ class AnswerAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(response.data["success"])
 
+    def test_create_answer_with_invalid_extension_fails(self):
+        self.client.force_authenticate(user=self.other)
+        payload = {
+            "content": "새 답변",
+            "images": [make_invalid_extension_file()],
+        }
+        response = self.client.post(
+            f"/api/questions/{self.question.id}/answers/", payload, format="multipart"
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(response.data["success"])
+
     def test_resolved_question_blocks_answer(self):
         self.question.status = Question.Status.RESOLVED
         self.question.save()
@@ -280,6 +310,41 @@ class AnswerAPITests(APITestCase):
             f"/api/questions/{self.question.id}/answers/", payload, format="multipart"
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_update_answer_replaces_images(self):
+        self.client.force_authenticate(user=self.answer_author)
+        # 기존 답변에 이미지 1장 추가
+        AnswerImage.objects.create(
+            answer=self.answer, image=make_image("old.png"), display_order=1
+        )
+        self.assertEqual(self.answer.images.count(), 1)
+
+        payload = {
+            "content": "이미지 교체된 답변",
+            "images": [make_image("new1.png"), make_image("new2.png")],
+        }
+        response = self.client.patch(
+            f"/api/answers/{self.answer.id}/", payload, format="multipart"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.answer.refresh_from_db()
+        self.assertEqual(self.answer.images.count(), 2)
+
+    def test_update_answer_without_images_keeps_existing(self):
+        self.client.force_authenticate(user=self.answer_author)
+        AnswerImage.objects.create(
+            answer=self.answer, image=make_image("keep.png"), display_order=1
+        )
+        self.assertEqual(self.answer.images.count(), 1)
+
+        response = self.client.patch(
+            f"/api/answers/{self.answer.id}/", {"content": "내용만 수정"}
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.answer.refresh_from_db()
+        self.assertEqual(self.answer.images.count(), 1)
 
 
 # =========================================================
