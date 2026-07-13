@@ -38,7 +38,8 @@ urlpatterns = [
 
     path("api/auth/", include("accounts.urls")),
     path("api/guides/", include("guides.urls")),
-    path("api/questions/", include("questions.urls")),
+    path("api/questions/", include("questions.question_urls")),
+    path("api/answers/", include("questions.answer_urls")),
     path("api/families/", include("families.urls")),
 ]
 
