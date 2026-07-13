@@ -8,15 +8,18 @@ class Category(models.TextChoices):
     LIFE = "LIFE", "생활"
     ETC = "ETC", "기타"
 
+class Visibility(models.TextChoices):
+    PUBLIC = 'public', '공개'
+    PRIVATE = 'private', '비공개'
+
 class Guide(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='guides')
     title = models.CharField(max_length=200)
     category = models.CharField(max_length=20, choices=Category.choices)
-    visibility = models.CharField(max_length=10, default='public') 
+    visibility = models.CharField(max_length=10, choices=Visibility.choices, default=Visibility.PUBLIC) 
     view_count = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    # question = models.ForeignKey('questions.Question', on_delete=models.SET_NULL, null=True, blank=True, related_name='guides')
 
     def __str__(self):
         return self.title
@@ -24,23 +27,25 @@ class Guide(models.Model):
 class GuideImage(models.Model):
     guide = models.ForeignKey(Guide, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='guides/%Y/%m/%d/')
-    description = models.TextField(blank=True)
+    description = models.TextField(blank=True) 
+    is_baked = models.BooleanField(default=False) 
     display_order = models.PositiveIntegerField(default=1)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['display_order']
-        unique_together = ['guide', 'display_order']
 
-class Annotation(models.Model):
-    guide_image = models.ForeignKey(GuideImage, on_delete=models.CASCADE, related_name='annotations')
-    shape_type = models.CharField(max_length=50) 
-    x_ratio = models.DecimalField(max_digits=7, decimal_places=6)
-    y_ratio = models.DecimalField(max_digits=7, decimal_places=6)
-    width_ratio = models.DecimalField(max_digits=7, decimal_places=6)
-    height_ratio = models.DecimalField(max_digits=7, decimal_places=6)
-    annotation_text = models.CharField(max_length=500, blank=True)
-    display_order = models.IntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+class GuideLike(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    guide = models.ForeignKey(Guide, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True) # 좋아요 누른 시간 저장!
+
+    class Meta:
+        unique_together = ('user', 'guide')
+
+class GuideScrap(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    guide = models.ForeignKey(Guide, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True) # 스크랩한 시간 저장!
+
+    class Meta:
+        unique_together = ('user', 'guide')
