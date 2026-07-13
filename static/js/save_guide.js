@@ -1,4 +1,4 @@
-// save_guid.js
+// save_guide.js
 
 document.addEventListener("DOMContentLoaded", () => {
 

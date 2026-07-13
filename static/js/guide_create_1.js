@@ -1,4 +1,4 @@
-/* static/js/guid_create_1.js */
+/* static/js/guide_create_1.js */
 
 document.addEventListener('DOMContentLoaded', function() {
     const imageInput = document.getElementById('imageInput');
