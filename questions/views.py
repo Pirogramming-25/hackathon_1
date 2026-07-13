@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.db import transaction
 
-from .models import Answer, Question, QuestionImage
+from .models import Answer, AnswerImage, Question, QuestionImage
 from .permissions import (
     IsAnswerAuthor,
     IsAnswerAuthorForGuideData,
@@ -44,6 +44,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Question.objects.select_related("author").order_by("-created_at")
+
         if self.action == "list":
             queryset = queryset.annotate(
                 answer_count_cache=Count("answers")
@@ -53,6 +54,31 @@ class QuestionViewSet(viewsets.ModelViewSet):
                     queryset=QuestionImage.objects.order_by("display_order"),
                 )
             )
+
+        elif self.action == "retrieve":
+            queryset = queryset.prefetch_related(
+                Prefetch(
+                    "images",
+                    queryset=QuestionImage.objects.order_by("display_order"),
+                ),
+                Prefetch(
+                    "answers",
+                    queryset=(
+                        Answer.objects
+                        .select_related("author")
+                        .prefetch_related(
+                            Prefetch(
+                                "images",
+                                queryset=AnswerImage.objects.order_by(
+                                    "display_order"
+                                ),
+                            )
+                        )
+                        .order_by("created_at")
+                    ),
+                ),
+            )
+
         return queryset
 
     def get_serializer_class(self):
@@ -236,7 +262,19 @@ class MyQuestionListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Question.objects.filter(author=self.request.user).order_by("-created_at")
+        return (
+            Question.objects
+            .filter(author=self.request.user)
+            .select_related("author")
+            .annotate(answer_count_cache=Count("answers"))
+            .prefetch_related(
+                Prefetch(
+                    "images",
+                    queryset=QuestionImage.objects.order_by("display_order"),
+                )
+            )
+            .order_by("-created_at")
+        )
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -251,7 +289,12 @@ class MyAnswerListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Answer.objects.filter(author=self.request.user).order_by("-created_at")
+        return (
+            Answer.objects
+            .filter(author=self.request.user)
+            .select_related("question")
+            .order_by("-created_at")
+        )
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
