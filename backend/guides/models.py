@@ -26,7 +26,7 @@ class Guide(models.Model):
 
 class GuideImage(models.Model):
     guide = models.ForeignKey(Guide, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='guides/%Y/%m/%d/')
+    image = models.ImageField(upload_to='guides/')
     description = models.TextField(blank=True) 
     is_baked = models.BooleanField(default=False) 
     display_order = models.PositiveIntegerField(default=1)
