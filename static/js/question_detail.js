@@ -427,6 +427,76 @@ function bindAnswerImageDescriptions() {
     return;
   }
 
+  function renderList() {
+    const previousDescriptions = Array.from(
+      document.querySelectorAll(".answer-image-description")
+    ).map((input) => input.value);
+
+    const files = Array.from(imageInput.files);
+
+    descriptionList.innerHTML = files
+      .map(
+        (file, index) => `
+          <div class="answer-image-description-item">
+            <p>${escapeHtml(file.name)}</p>
+
+            <div class="answer-image-description-row">
+              <input
+                type="text"
+                class="answer-image-description"
+                data-index="${index}"
+                placeholder="이미지 설명을 입력하세요. 선택 사항"
+                value="${escapeHtml(previousDescriptions[index] ?? "")}"
+              >
+              <button
+                type="button"
+                class="answer-image-annotate-btn"
+                data-index="${index}"
+              >
+                ✏️ 그림으로 표시
+              </button>
+            </div>
+          </div>
+        `
+      )
+      .join("");
+
+    descriptionList
+      .querySelectorAll(".answer-image-annotate-btn")
+      .forEach((button) => {
+        button.addEventListener("click", async () => {
+          const index = Number(button.dataset.index);
+          const currentFiles = Array.from(imageInput.files);
+          const targetFile = currentFiles[index];
+
+          if (!targetFile) {
+            return;
+          }
+
+          const originalText = button.textContent;
+          button.disabled = true;
+          button.textContent = "편집 중...";
+
+          const bakedFile = await openImageAnnotator(targetFile);
+
+          button.disabled = false;
+          button.textContent = originalText;
+
+          if (!bakedFile) {
+            return;
+          }
+
+          const dataTransfer = new DataTransfer();
+          currentFiles.forEach((file, i) => {
+            dataTransfer.items.add(i === index ? bakedFile : file);
+          });
+          imageInput.files = dataTransfer.files;
+
+          renderList();
+        });
+      });
+  }
+
   imageInput.addEventListener("change", () => {
     const files = Array.from(imageInput.files);
 
@@ -437,23 +507,21 @@ function bindAnswerImageDescriptions() {
       return;
     }
 
-    descriptionList.innerHTML = files
-      .map(
-        (file, index) => `
-          <div class="answer-image-description-item">
-            <p>${escapeHtml(file.name)}</p>
-            <input
-              type="text"
-              class="answer-image-description"
-              data-index="${index}"
-              placeholder="이미지 설명을 입력하세요. 선택 사항"
-            >
-          </div>
-        `
-      )
-      .join("");
+    const oversizedFile = files.find(
+      (file) => file.size > 5 * 1024 * 1024
+    );
+
+    if (oversizedFile) {
+      alert("이미지는 파일당 5MB 이하여야 합니다.");
+      imageInput.value = "";
+      descriptionList.innerHTML = "";
+      return;
+    }
+
+    renderList();
   });
 }
+
 function bindAnswerForm() {
   const answerForm = document.querySelector("#answer-form");
 
