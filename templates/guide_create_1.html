@@ -6,24 +6,31 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/guide_create_1.css' %}">
+<link
+    rel="stylesheet"
+    href="{% static 'css/guide_create_1.css' %}"
+>
 {% endblock %}
 
 {% block content %}
-
 <div class="guide-create-page">
 
     <div class="page-header">
         <h1>설명서 작성</h1>
-        <p>기본 정보를 입력한 후 화면 사진을 등록해주세요.</p>
+        <p>
+            기본 정보를 입력하고 화면별 설명을 만들어주세요.
+        </p>
     </div>
 
-    <form class="guide-form" method="post" enctype="multipart/form-data">
+    <form
+        class="guide-form"
+        id="guideCreateForm"
+        novalidate
+    >
         {% csrf_token %}
 
-        <!-- 제목 -->
+        <!-- 설명서 제목 -->
         <div class="form-group">
-
             <label for="title">
                 설명서 제목
             </label>
@@ -32,113 +39,235 @@
                 type="text"
                 id="title"
                 name="title"
+                maxlength="200"
                 placeholder="예) 카카오톡 증명서 발급하기"
+                required
             >
-
         </div>
-
 
         <!-- 카테고리 -->
         <div class="form-group">
-
             <label for="category">
                 분야
             </label>
 
-            <select id="category" name="category">
-
-                <option selected disabled>
+            <select
+                id="category"
+                name="category"
+                required
+            >
+                <option
+                    value=""
+                    selected
+                    disabled
+                >
                     분야를 선택해주세요.
                 </option>
 
-                <option>금융</option>
-                <option>정부24</option>
-                <option>카카오톡</option>
-                <option>병원</option>
-                <option>교통</option>
-                <option>쇼핑</option>
-                <option>기타</option>
+                <option value="GOVERNMENT">
+                    정부
+                </option>
 
+                <option value="FINANCE">
+                    금융
+                </option>
+
+                <option value="MEDICAL">
+                    의료
+                </option>
+
+                <option value="LIFE">
+                    생활
+                </option>
+
+                <option value="ETC">
+                    기타
+                </option>
             </select>
-
         </div>
 
-
-        <!-- 공개범위 -->
+        <!-- 공개 범위 -->
         <div class="form-group">
-
-            <label for="scope">
+            <label for="visibility">
                 공개 범위
             </label>
 
-            <select id="scope" name="scope">
-
-                <option selected>
+            <select
+                id="visibility"
+                name="visibility"
+                required
+            >
+                <option value="PUBLIC" selected>
                     전체 공개
                 </option>
 
-                <option>
+                <option value="PRIVATE">
                     나만 보기
                 </option>
-
             </select>
-
         </div>
 
-
-        <!-- 사진 업로드 -->
-
+        <!-- 이미지 업로드 -->
         <div class="form-group">
-
             <label>
                 화면 사진
             </label>
 
-            <label for="imageInput" class="upload-box">
-
+            <label
+                for="imageInput"
+                class="upload-box"
+                id="uploadBox"
+            >
                 <span class="material-symbols-rounded upload-icon">
                     add_photo_alternate
                 </span>
 
-                <h3>이미지를 추가해주세요.</h3>
+                <h3>
+                    이미지를 추가해주세요.
+                </h3>
 
-                <p>클릭하거나 파일을 드래그하여 업로드</p>
+                <p>
+                    클릭하거나 파일을 드래그하여 업로드
+                </p>
 
-                <small>최대 20장까지 업로드 가능합니다.</small>
+                <small>
+                    JPG, PNG, WEBP · 파일당 5MB · 최대 20장
+                </small>
 
                 <input
                     type="file"
                     id="imageInput"
                     multiple
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp"
                     hidden
                 >
-
             </label>
-
         </div>
 
+        <!-- 이미지가 한 장 이상 있을 때만 표시 -->
+        <section
+            id="imageEditorSection"
+            class="image-editor-section"
+            hidden
+        >
+            <div class="uploaded-images-header">
+                <div>
+                    <h2>
+                        등록한 화면
+                        <span id="imageCount">0</span>장
+                    </h2>
 
-        <!-- 미리보기 -->
+                    <p>
+                        썸네일을 눌러 화면별 표시와 설명을 작성해주세요.
+                    </p>
+                </div>
+            </div>
 
-        <div id="previewArea" class="preview-area"></div>
+            <!-- 업로드한 이미지 목록 -->
+            <div
+                id="thumbnailList"
+                class="thumbnail-list"
+                aria-label="등록한 화면 목록"
+            ></div>
 
+            <!-- 현재 선택한 이미지 편집 영역 -->
+            <div class="selected-image-editor">
+
+                <div class="selected-image-header">
+                    <div>
+                        <span class="selected-image-label">
+                            선택한 화면
+                        </span>
+
+                        <h3 id="selectedImageTitle">
+                            화면 1
+                        </h3>
+                    </div>
+
+                    <span
+                        id="selectedImageStatus"
+                        class="selected-image-status"
+                    >
+                        원본 이미지
+                    </span>
+                </div>
+
+                <div class="main-image-container">
+                    <img
+                        id="mainPreviewImage"
+                        src=""
+                        alt="현재 선택한 화면"
+                    >
+                </div>
+
+                <div class="image-edit-actions">
+                    <button
+                        type="button"
+                        id="annotateImageBtn"
+                        class="annotate-image-btn"
+                    >
+                        <span class="material-symbols-rounded">
+                            draw
+                        </span>
+
+                        <span id="annotateButtonText">
+                            그림으로 표시
+                        </span>
+                    </button>
+
+                    <button
+                        type="button"
+                        id="restoreOriginalBtn"
+                        class="restore-original-btn"
+                        hidden
+                    >
+                        <span class="material-symbols-rounded">
+                            restart_alt
+                        </span>
+
+                        원본으로 되돌리기
+                    </button>
+                </div>
+
+                <div class="image-description-group">
+                    <label for="imageDescription">
+                        이 화면에 대한 설명
+                    </label>
+
+                    <textarea
+                        id="imageDescription"
+                        maxlength="2000"
+                        rows="4"
+                        placeholder="예) 우측 상단에 있는 돋보기 버튼을 누르세요."
+                    ></textarea>
+
+                    <p>
+                        썸네일을 바꾸면 각 화면의 설명도 따로 저장됩니다.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <p
+            id="guideCreateError"
+            class="form-error"
+            role="alert"
+        ></p>
 
         <div class="submit-area">
-
-            <!-- 실제로는 guide_create_2로 넘어가면 됨 -->
-            <a href="{% url 'guide_create_2' %}" class="next-btn">
-                다음 단계 →
-            </a>
-
+            <button
+                type="submit"
+                class="next-btn"
+                id="saveGuideBtn"
+            >
+                설명서 등록하기
+            </button>
         </div>
-
     </form>
-
 </div>
-
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'js/image-annotator.js' %}"></script>
 <script src="{% static 'js/guide_create_1.js' %}"></script>
 {% endblock %}

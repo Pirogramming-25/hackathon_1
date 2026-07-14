@@ -1,7 +1,7 @@
 /* static/css/guide_create_1.css */
 
 .guide-create-page {
-    max-width: 800px;
+    max-width: 900px;
     margin: 40px auto;
     padding: 40px;
     background-color: var(--color-white);
@@ -150,4 +150,388 @@
     background-color: var(--color-primary-hover);
     transform: translateY(-2px);
     box-shadow: var(--shadow-card-hover);
+}
+
+/* =====================================================
+   드래그 업로드 상태
+===================================================== */
+
+.upload-box.is-dragging {
+    background-color: var(--color-primary-light);
+    border-style: solid;
+    transform: translateY(-2px);
+}
+
+
+/* =====================================================
+   등록 이미지 편집 영역
+===================================================== */
+
+.image-editor-section {
+    margin-top: 36px;
+    padding-top: 32px;
+    border-top: 1px solid var(--color-border);
+}
+
+.uploaded-images-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 18px;
+}
+
+.uploaded-images-header h2 {
+    margin: 0 0 8px;
+    color: var(--color-text);
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.uploaded-images-header h2 span {
+    color: var(--color-primary);
+}
+
+.uploaded-images-header p {
+    margin: 0;
+    color: var(--color-text-sub);
+    font-size: 16px;
+}
+
+
+/* =====================================================
+   이미지 썸네일 목록
+===================================================== */
+
+.thumbnail-list {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding: 4px 4px 14px;
+    margin-bottom: 24px;
+    scroll-behavior: smooth;
+}
+
+.thumbnail-card {
+    position: relative;
+    flex: 0 0 126px;
+    width: 126px;
+    padding: 4px;
+    border: 2px solid transparent;
+    border-radius: 14px;
+    background-color: var(--color-white);
+    transition:
+        border-color var(--transition-base),
+        box-shadow var(--transition-base);
+}
+
+.thumbnail-card.is-selected {
+    border-color: var(--color-primary);
+    box-shadow:
+        0 0 0 3px var(--color-primary-light);
+}
+
+.thumbnail-select-button {
+    position: relative;
+    width: 100%;
+    height: 104px;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 10px;
+    background-color: var(--color-bg-soft);
+    cursor: pointer;
+}
+
+.thumbnail-select-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.thumbnail-order-badge {
+    position: absolute;
+    left: 7px;
+    bottom: 7px;
+    min-width: 26px;
+    height: 26px;
+    padding: 0 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background-color: rgba(0, 0, 0, 0.72);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.thumbnail-edited-badge {
+    position: absolute;
+    top: 7px;
+    left: 7px;
+    padding: 5px 8px;
+    border-radius: 999px;
+    background-color: var(--color-primary);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.thumbnail-delete-button {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.75);
+    color: #ffffff;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.thumbnail-delete-button .material-symbols-rounded {
+    font-size: 18px;
+}
+
+
+/* =====================================================
+   선택 이미지 집중 편집
+===================================================== */
+
+.selected-image-editor {
+    padding: 24px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-bg-soft);
+}
+
+.selected-image-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.selected-image-label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--color-text-sub);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.selected-image-header h3 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.selected-image-status {
+    flex: 0 0 auto;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background-color: #e9edf3;
+    color: var(--color-text-sub);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.selected-image-status.is-edited {
+    background-color: var(--color-primary-light);
+    color: var(--color-primary);
+}
+
+.main-image-container {
+    width: 100%;
+    min-height: 360px;
+    max-height: 560px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: #ffffff;
+}
+
+.main-image-container img {
+    display: block;
+    width: 100%;
+    max-height: 560px;
+    object-fit: contain;
+}
+
+
+/* =====================================================
+   그림 표시 버튼
+===================================================== */
+
+.image-edit-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.annotate-image-btn,
+.restore-original-btn {
+    min-height: 52px;
+    padding: 0 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    transition:
+        background-color var(--transition-base),
+        transform var(--transition-base);
+}
+
+.annotate-image-btn {
+    flex: 1;
+    border: 1px solid var(--color-primary);
+    background-color: var(--color-primary);
+    color: #ffffff;
+}
+
+.annotate-image-btn:hover {
+    background-color: var(--color-primary-hover);
+    transform: translateY(-1px);
+}
+
+.restore-original-btn {
+    border: 1px solid var(--color-border);
+    background-color: #ffffff;
+    color: var(--color-text);
+}
+
+.restore-original-btn:hover {
+    background-color: #f3f5f8;
+}
+
+.annotate-image-btn:disabled,
+.restore-original-btn:disabled,
+.next-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+}
+
+
+/* =====================================================
+   이미지별 설명
+===================================================== */
+
+.image-description-group {
+    margin-top: 24px;
+}
+
+.image-description-group label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--color-text);
+    font-size: var(--font-card-title);
+    font-weight: 800;
+}
+
+.image-description-group textarea {
+    width: 100%;
+    min-height: 130px;
+    padding: 18px 20px;
+    resize: vertical;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: #ffffff;
+    color: var(--color-text);
+    font-family: inherit;
+    font-size: 17px;
+    line-height: 1.6;
+    outline: none;
+    transition:
+        border-color var(--transition-base),
+        box-shadow var(--transition-base);
+}
+
+.image-description-group textarea:focus {
+    border-color: var(--color-primary);
+    box-shadow:
+        0 0 0 4px var(--color-primary-light);
+}
+
+.image-description-group textarea::placeholder {
+    color: var(--color-text-sub);
+}
+
+.image-description-group p {
+    margin: 8px 0 0;
+    color: var(--color-text-sub);
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   오류 메시지
+===================================================== */
+
+.form-error {
+    min-height: 24px;
+    margin: 20px 0 0;
+    color: #c62828;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+
+/* =====================================================
+   반응형
+===================================================== */
+
+@media (max-width: 700px) {
+    .guide-create-page {
+        margin: 20px 12px;
+        padding: 24px 18px;
+    }
+
+    .upload-box {
+        padding: 42px 16px;
+    }
+
+    .selected-image-editor {
+        padding: 16px;
+    }
+
+    .selected-image-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .main-image-container {
+        min-height: 250px;
+    }
+
+    .image-edit-actions {
+        flex-direction: column;
+    }
+
+    .annotate-image-btn,
+    .restore-original-btn {
+        width: 100%;
+    }
+
+    .submit-area {
+        justify-content: stretch;
+    }
+
+    .next-btn {
+        width: 100%;
+    }
 }
