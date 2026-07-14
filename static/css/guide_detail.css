@@ -10,6 +10,10 @@
 .detail-back-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    min-width: 112px;
+    min-height: 48px;
+    white-space: nowrap;
     gap: 2px;
     margin-bottom: 28px;
     padding: 10px 16px 10px 10px;

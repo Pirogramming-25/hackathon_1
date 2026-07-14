@@ -14,6 +14,10 @@
     left: 0;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    min-width: 112px;
+    min-height: 48px;
+    white-space: nowrap;
     gap: 2px;
     padding: 10px 16px 10px 10px;
     border: 0;
@@ -60,11 +64,11 @@
     font-weight: 700;
     color: var(--color-text);
     text-align: center; /* 피그마처럼 텍스트 중앙 정렬 */
-    border: 3px solid var(--color-primary);
+    border: 2px solid var(--color-border);
     border-radius: 30px;
     outline: none;
     background-color: var(--color-white);
-    transition: box-shadow var(--transition-base);
+    transition: border-color var(--transition-base);
 }
 
 .search-submit {
@@ -83,7 +87,7 @@
 }
 
 .search-input:focus {
-    box-shadow: 0 0 0 4px var(--color-primary-light);
+    border-color: var(--color-primary);
 }
 
 /* --- 필터 영역 --- */
