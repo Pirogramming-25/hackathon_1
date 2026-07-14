@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     # Third-party
+    "cloudinary_storage",
+    "cloudinary",
     "rest_framework",
 
     # Local apps
@@ -145,9 +147,15 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+CLOUDINARY_URL = os.getenv("CLOUDINARY_URL")
+
 STORAGES = {
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": (
+            "cloudinary_storage.storage.MediaCloudinaryStorage"
+            if CLOUDINARY_URL
+            else "django.core.files.storage.FileSystemStorage"
+        ),
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
