@@ -16,6 +16,34 @@
 
 }
 
+.family-back-row {
+    max-width: 1200px;
+    margin: 0 auto 24px;
+}
+
+.family-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 112px;
+    min-height: 48px;
+    white-space: nowrap;
+    gap: 2px;
+    padding: 10px 16px 10px 10px;
+    border-radius: 999px;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+.family-back-btn:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+}
+
 
 
 .family-container {

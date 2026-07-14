@@ -1,33 +1,71 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
 
-{% block title %}질문 목록{% endblock %}
+{% block title %}설명서 목록 - 똑디{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/question_list.css' %}">
+<link rel="stylesheet" href="{% static 'css/guide_list.css' %}?v=9">
 {% endblock %}
 
 {% block content %}
-<main class="question-list-page">
-    <section class="question-list-header">
-        <div>
-            <h1>질문 목록</h1>
-            <p>디지털 사용 중 궁금한 내용을 확인하세요.</p>
-        </div>
+<div class="guide-list-page page-wrap">
+    <button type="button" class="guide-back-btn" id="guideBackBtn" aria-label="이전 페이지로 이동">
+        <span class="material-symbols-rounded">chevron_left</span>
+        이전
+    </button>
 
-        <a href="{% url 'question_create' %}" class="question-create-btn">
-            질문 등록
+    <h1 class="page-title" id="guideListTitle">설명서 목록</h1>
+
+    <div class="search-section">
+        <form action="{% url 'guide_page_list' %}" method="GET" class="search-form" id="guideSearchForm">
+            <input
+                type="text"
+                name="q"
+                class="search-input"
+                id="guideSearchInput"
+                placeholder="검색어를 입력해주세요"
+                autocomplete="off"
+            >
+            <button type="submit" class="search-submit" aria-label="설명서 검색">
+                <span class="material-symbols-rounded">search</span>
+            </button>
+        </form>
+    </div>
+
+    <div class="filter-section">
+        <button type="button" class="filter-btn active" data-sort="latest">최신순</button>
+        <button type="button" class="filter-btn" data-sort="most_scrapped">저장순</button>
+        <button type="button" class="filter-btn" data-sort="most_liked">도움이 됐어요</button>
+    </div>
+
+    <div class="guide-list-empty" id="guideListEmpty">
+        <p class="guide-list-status" id="guideListStatus" role="status">설명서를 불러오는 중입니다.</p>
+        <a
+            href="{% if user.is_authenticated %}{% url 'question_create' %}{% else %}{% url 'login' %}?next={% url 'question_create' %}{% endif %}"
+            class="question-go-btn"
+            id="questionGoBtn"
+            hidden
+        >
+            <span class="material-symbols-rounded">help</span>
+            질문하러 가기
         </a>
-    </section>
+    </div>
+    <div class="guide-grid" id="guideGrid"></div>
 
-    <section id="question-list">
-        <p>질문을 불러오는 중입니다.</p>
-    </section>
-
-    <div id="pagination"></div>
-</main>
+    <nav class="guide-pagination" id="guidePagination" aria-label="설명서 목록 페이지" hidden>
+        <button type="button" class="pagination-btn" id="prevPageBtn">
+            <span class="material-symbols-rounded">chevron_left</span>
+            이전
+        </button>
+        <span class="pagination-current" id="currentPageText" aria-current="page">1</span>
+        <button type="button" class="pagination-btn" id="nextPageBtn">
+            다음
+            <span class="material-symbols-rounded">chevron_right</span>
+        </button>
+    </nav>
+</div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/question_list.js' %}"></script>
+<script src="{% static 'js/guide_list.js' %}?v=10"></script>
 {% endblock %}

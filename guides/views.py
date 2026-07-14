@@ -132,11 +132,21 @@ class GuideViewSet(viewsets.ModelViewSet):
         user = self.request.user
         
         if user.is_authenticated:
-            # PUBLIC + 본인작성 + 내가 공유받은(shares__recipient=user) PRIVATE 글 모두 포함
+            family_relations = FamilyRelation.objects.filter(
+                Q(user1=user) | Q(user2=user),
+                status=FamilyRelation.Status.ACCEPTED,
+            )
+            family_user_ids = []
+            for relation in family_relations:
+                family_user_ids.append(
+                    relation.user2_id if relation.user1_id == user.id else relation.user1_id
+                )
+
+            # PUBLIC + 본인 작성 + 가족이 작성한 PRIVATE 설명서
             queryset = queryset.filter(
                 Q(visibility=Visibility.PUBLIC) | 
                 Q(author=user) | 
-                Q(shares__recipient=user)
+                Q(author_id__in=family_user_ids)
             ).distinct()
             
             queryset = queryset.annotate(
@@ -153,12 +163,17 @@ class GuideViewSet(viewsets.ModelViewSet):
         
         if category: 
             queryset = queryset.filter(category=category.upper())
-        if search: 
-            queryset = queryset.filter(title__icontains=search)
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search)
+                | Q(images__description__icontains=search)
+            ).distinct()
 
         sort = self.request.query_params.get('sort', 'latest')
         if sort == 'most_scrapped': 
             queryset = queryset.order_by('-scrap_count', '-created_at')
+        elif sort == 'most_liked':
+            queryset = queryset.order_by('-like_count', '-created_at')
         else: 
             queryset = queryset.order_by('-created_at')
             
@@ -184,7 +199,10 @@ class GuideViewSet(viewsets.ModelViewSet):
             
         if 200 <= response.status_code < 300:
             message = "요청이 성공적으로 처리되었습니다."
-            if self.action == 'list': message = "설명서 목록 조회에 성공했습니다."
+            if self.action == 'list':
+                message = "설명서 목록 조회에 성공했습니다."
+                if isinstance(response.data, dict) and 'results' in response.data:
+                    response.data['page_size'] = self.paginator.page.paginator.per_page
             elif self.action == 'retrieve': message = "설명서 상세 조회에 성공했습니다."
             elif self.action == 'create': message = "설명서가 성공적으로 등록되었습니다."
             elif self.action in ['update', 'partial_update']: message = "설명서가 성공적으로 수정되었습니다."

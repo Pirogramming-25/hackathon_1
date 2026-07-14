@@ -28,6 +28,14 @@
       </a>
 
       <a
+        href="{% url 'guide_page_list' %}"
+        class="nav-btn {% if active_nav == 'guide_list' %}is-active{% endif %}"
+      >
+        <span class="material-symbols-rounded">menu_book</span>
+        설명서 목록
+      </a>
+
+      <a
         href="{% if user.is_authenticated %}{% url 'guide_create' %}{% else %}{% url 'login' %}?next={% url 'guide_create' %}{% endif %}"
         class="nav-btn {% if active_nav == 'guide_write' %}is-active{% endif %}"
       >

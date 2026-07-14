@@ -4,12 +4,19 @@
 {% block title %}질문 작성{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/question_create.css' %}">
+<link rel="stylesheet" href="{% static 'css/question_create.css' %}?v=6">
 {% endblock %}
 
 {% block content %}
 <section class="question-create-page">
-  <h1>질문 작성</h1>
+  <div class="question-create-header">
+    <button type="button" class="question-back-btn" id="questionBackBtn">
+      <span class="material-symbols-rounded">chevron_left</span>
+      이전
+    </button>
+
+    <h1>질문 작성</h1>
+  </div>
 
   <form id="question-create-form">
     <label for="question-title">제목</label>
@@ -58,5 +65,5 @@
 
 {% block extra_js %}
 <script src="{% static 'js/image-annotator.js' %}"></script>
-<script src="{% static 'js/question_create.js' %}"></script>
+<script src="{% static 'js/question_create.js' %}?v=2"></script>
 {% endblock %}

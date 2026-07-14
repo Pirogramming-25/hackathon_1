@@ -1,7 +1,21 @@
 document.addEventListener("DOMContentLoaded", () => {
+  bindBackButton();
   bindImageDescriptions();
   bindQuestionCreateForm();
 });
+
+function bindBackButton() {
+  const backButton = document.querySelector("#questionBackBtn");
+
+  backButton.addEventListener("click", () => {
+    if (window.history.length > 1) {
+      window.history.back();
+      return;
+    }
+
+    window.location.href = "/questions/";
+  });
+}
 
 function bindImageDescriptions() {
   const imageInput = document.querySelector("#question-images");

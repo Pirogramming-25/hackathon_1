@@ -3,7 +3,8 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from .models import Guide
+from .models import Guide, GuideImage, Visibility
+from families.models import FamilyRelation
 from questions.models import Question, Answer
 
 User = get_user_model()
@@ -65,3 +66,106 @@ class GuidePromoteTests(APITestCase):
         response = self.client.post(url, {"category": "FINANCE"})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(response.data["success"])
+
+
+class PrivateGuideFamilyAccessTests(APITestCase):
+    def setUp(self):
+        self.author = User.objects.create_user(
+            username="guide-author",
+            email="guide-author@test.com",
+            password="password",
+        )
+        self.family = User.objects.create_user(
+            username="family-user",
+            email="family-user@test.com",
+            password="password",
+        )
+        self.stranger = User.objects.create_user(
+            username="stranger-user",
+            email="stranger-user@test.com",
+            password="password",
+        )
+        user1, user2 = sorted([self.author, self.family], key=lambda user: user.pk)
+        FamilyRelation.objects.create(
+            user1=user1,
+            user2=user2,
+            requester=self.author,
+            status=FamilyRelation.Status.ACCEPTED,
+        )
+        self.private_guide = Guide.objects.create(
+            author=self.author,
+            title="가족용 설명서",
+            category="LIFE",
+            visibility=Visibility.PRIVATE,
+        )
+
+    def test_accepted_family_can_retrieve_private_guide(self):
+        self.client.force_authenticate(user=self.family)
+
+        response = self.client.get(f"/api/guides/{self.private_guide.pk}/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_accepted_family_sees_private_guide_in_list(self):
+        self.client.force_authenticate(user=self.family)
+
+        response = self.client.get("/api/guides/")
+        guide_ids = [guide["id"] for guide in response.data["data"]["results"]]
+
+        self.assertIn(self.private_guide.pk, guide_ids)
+
+    def test_non_family_cannot_retrieve_private_guide(self):
+        self.client.force_authenticate(user=self.stranger)
+
+        response = self.client.get(f"/api/guides/{self.private_guide.pk}/")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_anonymous_user_cannot_retrieve_private_guide(self):
+        response = self.client.get(f"/api/guides/{self.private_guide.pk}/")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class GuideListSearchTests(APITestCase):
+    def setUp(self):
+        self.author = User.objects.create_user(
+            username="search-author",
+            email="search-author@test.com",
+            password="password",
+        )
+
+    def test_search_includes_step_description(self):
+        guide = Guide.objects.create(
+            author=self.author,
+            title="휴대전화 사용법",
+            category="LIFE",
+            visibility=Visibility.PUBLIC,
+        )
+        GuideImage.objects.create(
+            guide=guide,
+            image="guides/test-image.jpg",
+            description="카카오톡 인증서를 발급합니다.",
+            display_order=1,
+        )
+
+        response = self.client.get("/api/guides/", {"search": "인증서"})
+        guide_ids = [item["id"] for item in response.data["data"]["results"]]
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(guide.pk, guide_ids)
+
+    def test_list_response_contains_page_size(self):
+        for index in range(11):
+            Guide.objects.create(
+                author=self.author,
+                title=f"설명서 {index}",
+                category="LIFE",
+                visibility=Visibility.PUBLIC,
+            )
+
+        response = self.client.get("/api/guides/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["data"]["page_size"], 10)
+        self.assertEqual(response.data["data"]["count"], 11)
