@@ -1,104 +1,48 @@
-// save_guide.js
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    // ==========================
-    // 정렬 버튼
-    // ==========================
-
-    const sortButtons = document.querySelectorAll(".sort-btn");
-
-    sortButtons.forEach((button) => {
-
-        button.addEventListener("click", () => {
-
-            sortButtons.forEach((btn) => {
-                btn.classList.remove("active");
-            });
-
-            button.classList.add("active");
-
-            // TODO : Django 정렬 연결
-
-        });
-
-    });
-
-
-    // ==========================
-    // 검색
-    // ==========================
-
-    const searchForm = document.querySelector(".guide-search");
-
-    if(searchForm){
-
-        searchForm.addEventListener("submit", (e) => {
-
-            e.preventDefault();
-
-            const keyword = searchForm.querySelector("input").value.trim();
-
-            if(keyword === ""){
-
-                alert("검색어를 입력해주세요.");
-
-                return;
-
-            }
-
-            // TODO : Django 검색 연결
-            console.log(keyword);
-
-        });
-
-    }
-
-
-    // ==========================
-    // 카드 클릭 효과
-    // ==========================
-
-    const cards = document.querySelectorAll(".guide-card");
-
-    cards.forEach((card) => {
-
-        card.addEventListener("mousedown", () => {
-
-            card.style.transform = "scale(0.98)";
-
-        });
-
-        card.addEventListener("mouseup", () => {
-
-            card.style.transform = "";
-
-        });
-
-        card.addEventListener("mouseleave", () => {
-
-            card.style.transform = "";
-
-        });
-
-    });
-
-});
-
 // static/js/save_guide.js
 
 let currentPage = 1;
 
 document.addEventListener("DOMContentLoaded", () => {
+  // 1. 데이터 로드 시작
   loadMyScraps(1);
+
+  // 2. 정렬 버튼 이벤트 연결
+  const sortButtons = document.querySelectorAll(".sort-btn");
+  sortButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      sortButtons.forEach((btn) => {
+        btn.classList.remove("active");
+      });
+      button.classList.add("active");
+      // TODO: 정렬 옵션을 적용하여 API 다시 호출 (예: loadMyScraps(1, '조회순'))
+    });
+  });
+
+  // 3. 검색 폼 이벤트 연결
+  const searchForm = document.querySelector(".guide-search");
+  if (searchForm) {
+    searchForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const keyword = searchForm.querySelector("input").value.trim();
+      if (keyword === "") {
+        alert("검색어를 입력해주세요.");
+        return;
+      }
+      // TODO: 검색어를 적용하여 API 다시 호출 (예: loadMyScraps(1, keyword))
+      console.log("검색어:", keyword);
+    });
+  }
 });
 
+// ==========================
+// API 호출 및 화면 렌더링
+// ==========================
 async function loadMyScraps(page) {
   const scrapList = document.querySelector("#scrap-list");
   const pagination = document.querySelector("#pagination");
 
   try {
-    // 🎯 백엔드의 '저장한 글(스크랩)' API 호출
+    // 백엔드의 '저장한 글(스크랩)' API 호출
     const response = await fetch(`/api/users/me/scraps/?page=${page}`, {
       method: "GET",
       credentials: "include",
@@ -126,36 +70,45 @@ async function loadMyScraps(page) {
       return;
     }
 
-    // 🎯 가져온 데이터를 설명서 카드 HTML로 변환
+    // 가져온 데이터를 설명서 카드 HTML로 변환
     scrapList.innerHTML = scraps
-      .map(
-        (scrap) => {
-          // 백엔드 구조에 따라 scrap 안에 guide가 중첩되어 있을 수 있으므로 방어 코드 추가
-          const guide = scrap.guide || scrap; 
-          
-          return `
-            <a href="/guides/${guide.id}/" class="guide-card">
-              <div class="card-image-placeholder">
-                  ${
-                    guide.images && guide.images.length > 0
-                      ? `<img src="${guide.images[0].image}" alt="설명서 썸네일">`
-                      : '<div class="no-image">이미지 없음</div>'
-                  }
+      .map((scrap) => {
+        // 백엔드 구조 방어 코드
+        const guide = scrap.guide || scrap; 
+        
+        // 🎯 is_scrapped 상태에 따라 북마크 아이콘 결정
+        // (저장한 글 목록이므로 기본적으로 true이겠지만, 명확히 처리)
+        const isScrapped = guide.is_scrapped !== false; 
+        const bookmarkIcon = isScrapped ? "bookmark" : "bookmark_border"; 
+
+        return `
+          <a href="/guides/${guide.id}/" class="guide-card">
+            <div class="guide-thumbnail card-image-placeholder">
+                ${
+                  guide.images && guide.images.length > 0
+                    ? `<img src="${guide.images[0].image}" alt="설명서 썸네일">`
+                    : `<span class="material-symbols-rounded">${bookmarkIcon}</span>`
+                }
+            </div>
+            
+            <div class="guide-info guide-card-info">
+              <h3 class="card-title">${escapeHtml(guide.title)}</h3>
+              <div class="guide-meta">
+                <span>조회수 ${guide.view_count || 0}</span>
+                <span>${formatDate(guide.created_at)}</span>
               </div>
-              <div class="guide-card-info">
-                <h3 class="card-title">${escapeHtml(guide.title)}</h3>
-                <div class="guide-meta">
-                  <span>조회수 ${guide.view_count || 0}</span>
-                  <span>${formatDate(guide.created_at)}</span>
-                </div>
-              </div>
-            </a>
-          `;
-        }
-      )
+            </div>
+          </a>
+        `;
+      })
       .join("");
 
+    // 동적으로 생성된 카드들에 클릭/마우스 효과 적용
+    applyCardEffects();
+    
+    // 페이지네이션 렌더링
     renderPagination(result.data, page, pagination);
+
   } catch (error) {
     scrapList.innerHTML = `
       <p class="error-message">
@@ -166,8 +119,26 @@ async function loadMyScraps(page) {
   }
 }
 
+// ==========================
+// 카드 마우스 효과 함수 분리
+// ==========================
+function applyCardEffects() {
+  const cards = document.querySelectorAll(".guide-card");
+  cards.forEach((card) => {
+    card.addEventListener("mousedown", () => {
+      card.style.transform = "scale(0.98)";
+    });
+    card.addEventListener("mouseup", () => {
+      card.style.transform = "";
+    });
+    card.addEventListener("mouseleave", () => {
+      card.style.transform = "";
+    });
+  });
+}
+
 // ==========================================
-// 유틸리티 함수들 (기존에 사용하시던 것 그대로)
+// 유틸리티 함수들
 // ==========================================
 
 function renderPagination(pageData, page, pagination) {
