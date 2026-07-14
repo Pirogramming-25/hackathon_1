@@ -3,7 +3,7 @@
 {% block title %}홈 - 무엇이 궁금하신가요? | 똑디{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="{% static 'css/home.css' %}?v=2">
 {% endblock %}
 
 {% block content %}
@@ -16,8 +16,11 @@
              name="q"
              id="searchInput"
              class="search-box__input"
-             placeholder="    예: 카카오톡 인증서 어떻게 받아요?"
-             autocomplete="off">
+             placeholder="예: 카카오톡 인증서 어떻게 받아요?"
+             autocomplete="off"
+             pattern=".*\S.*"
+             title="검색어를 입력해주세요."
+             required>
 
       <button type="submit" class="search-box__submit" aria-label="검색하기">
         <span class="material-symbols-rounded">search</span>
@@ -42,7 +45,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/home.js' %}"></script>
+<script src="{% static 'js/home.js' %}?v=2"></script>
 <script>
   window.DDOKDI_IS_AUTHENTICATED = {{ user.is_authenticated|yesno:"true,false" }};
   window.DDOKDI_LOGIN_URL = "#";

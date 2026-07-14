@@ -4,12 +4,17 @@
 {% block title %}설명서 목록 - 똑디{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/guide_list.css' %}">
+<link rel="stylesheet" href="{% static 'css/guide_list.css' %}?v=6">
 {% endblock %}
 
 {% block content %}
 <div class="guide-list-page page-wrap">
-    <h1 class="page-title">설명서 목록</h1>
+    <button type="button" class="guide-back-btn" id="guideBackBtn" aria-label="이전 페이지로 이동">
+        <span class="material-symbols-rounded">chevron_left</span>
+        이전
+    </button>
+
+    <h1 class="page-title" id="guideListTitle">설명서 목록</h1>
 
     <div class="search-section">
         <form action="{% url 'guide_page_list' %}" method="GET" class="search-form" id="guideSearchForm">
@@ -30,13 +35,37 @@
     <div class="filter-section">
         <button type="button" class="filter-btn active" data-sort="latest">최신순</button>
         <button type="button" class="filter-btn" data-sort="most_scrapped">저장순</button>
+        <button type="button" class="filter-btn" data-sort="most_liked">도움이 됐어요</button>
     </div>
 
-    <p class="guide-list-status" id="guideListStatus" role="status">설명서를 불러오는 중입니다.</p>
+    <div class="guide-list-empty" id="guideListEmpty">
+        <p class="guide-list-status" id="guideListStatus" role="status">설명서를 불러오는 중입니다.</p>
+        <a
+            href="{% if user.is_authenticated %}{% url 'question_create' %}{% else %}{% url 'login' %}?next={% url 'question_create' %}{% endif %}"
+            class="question-go-btn"
+            id="questionGoBtn"
+            hidden
+        >
+            <span class="material-symbols-rounded">help</span>
+            질문하러 가기
+        </a>
+    </div>
     <div class="guide-grid" id="guideGrid"></div>
+
+    <nav class="guide-pagination" id="guidePagination" aria-label="설명서 목록 페이지" hidden>
+        <button type="button" class="pagination-btn" id="prevPageBtn">
+            <span class="material-symbols-rounded">chevron_left</span>
+            이전
+        </button>
+        <span class="pagination-current" id="currentPageText" aria-current="page">1</span>
+        <button type="button" class="pagination-btn" id="nextPageBtn">
+            다음
+            <span class="material-symbols-rounded">chevron_right</span>
+        </button>
+    </nav>
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/guide_list.js' %}"></script>
+<script src="{% static 'js/guide_list.js' %}?v=9"></script>
 {% endblock %}

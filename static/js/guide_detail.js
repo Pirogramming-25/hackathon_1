@@ -1,79 +1,144 @@
-/* static/js/guide_detail.js */
+document.addEventListener('DOMContentLoaded', () => {
+    const guideId = window.location.pathname.split('/').filter(Boolean).pop();
+    const content = document.getElementById('guideDetailContent');
+    const statusText = document.getElementById('detailStatus');
+    const title = document.getElementById('guideTitle');
+    const meta = document.getElementById('guideMeta');
+    const steps = document.getElementById('guideSteps');
+    const stepNav = document.getElementById('stepNav');
+    const stepNavArea = document.getElementById('stepNavArea');
+    const backButton = document.getElementById('detailBackBtn');
+    const saveButton = document.getElementById('saveBtn');
+    const likeButton = document.getElementById('likeBtn');
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-document.addEventListener("DOMContentLoaded", () => {
+    backButton.addEventListener('click', () => {
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            window.location.href = '/guides/';
+        }
+    });
 
-    // ==========================
-    // 1. 저장하기 버튼 토글
-    // ==========================
-    const saveBtn = document.querySelector(".save-btn");
-
-    if (saveBtn) {
-        saveBtn.addEventListener("click", () => {
-            saveBtn.classList.toggle("active");
-
-            if (saveBtn.classList.contains("active")) {
-                saveBtn.innerHTML = `
-                    <span class="material-symbols-rounded">bookmark</span>
-                    저장 완료
-                `;
-            } else {
-                saveBtn.innerHTML = `
-                    <span class="material-symbols-rounded">bookmark</span>
-                    저장하기
-                `;
-            }
-        });
+    function updateActionButton(button, active, activeText, inactiveText) {
+        button.classList.toggle('active', active);
+        button.querySelector('.action-label').textContent = active ? activeText : inactiveText;
     }
 
-    // ==========================
-    // 2. 도움이 됐어요 버튼 토글
-    // ==========================
-    const likeBtn = document.querySelector(".like-btn");
+    function createStep(imageData, index) {
+        const section = document.createElement('section');
+        section.id = `step${index + 1}`;
+        section.className = 'step-section';
 
-    if (likeBtn) {
-        likeBtn.addEventListener("click", () => {
-            likeBtn.classList.toggle("active");
+        const card = document.createElement('div');
+        card.className = 'step-card';
 
-            if (likeBtn.classList.contains("active")) {
-                likeBtn.innerHTML = `
-                    <span class="material-symbols-rounded">thumb_up</span>
-                    감사합니다!
-                `;
-            } else {
-                likeBtn.innerHTML = `
-                    <span class="material-symbols-rounded">thumb_up</span>
-                    도움이 됐어요
-                `;
-            }
-        });
+        const image = document.createElement('img');
+        image.className = 'step-image';
+        image.src = imageData.image;
+        image.alt = `${index + 1}단계 이미지`;
+        image.loading = 'lazy';
+        card.appendChild(image);
+
+        if (imageData.description) {
+            const description = document.createElement('p');
+            description.className = 'step-desc';
+            description.textContent = imageData.description;
+            card.appendChild(description);
+        }
+
+        section.appendChild(card);
+        return section;
     }
 
-    // ==========================
-    // 3. 우측 STEP 네비게이션 부드러운 스크롤 + 현재 스텝 활성화 효과
-    // ==========================
-    const stepLinks = document.querySelectorAll(".step-nav a");
+    function createStepLink(index) {
+        const link = document.createElement('a');
+        link.href = `#step${index + 1}`;
+        link.className = `step-link${index === 0 ? ' active' : ''}`;
+        link.textContent = String(index + 1);
+        link.addEventListener('click', (event) => {
+            event.preventDefault();
+            document.querySelector(link.hash).scrollIntoView({ behavior: 'smooth', block: 'start' });
+            stepNav.querySelectorAll('.step-link').forEach((item) => item.classList.remove('active'));
+            link.classList.add('active');
+        });
+        return link;
+    }
 
-    stepLinks.forEach(link => {
-        link.addEventListener("click", (e) => {
-            const hrefAttr = link.getAttribute("href");
-            
-            // 빈 링크(#) 처리 방지
-            if (hrefAttr === "#" || !hrefAttr.startsWith("#")) return;
-            
-            e.preventDefault();
-            const target = document.querySelector(hrefAttr);
+    async function toggleAction(action, button) {
+        if (!window.DDOKDI_IS_AUTHENTICATED) {
+            const next = encodeURIComponent(window.location.pathname);
+            window.location.href = `${window.DDOKDI_LOGIN_URL}?next=${next}`;
+            return;
+        }
 
-            if (target) {
-                // 오른쪽 번호 버튼들의 active 표시 순체 전환
-                stepLinks.forEach(l => l.classList.remove("active"));
-                link.classList.add("active");
+        button.disabled = true;
+        try {
+            const response = await fetch(`/api/guides/${guideId}/${action}/`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    Accept: 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+            });
+            const body = await response.json();
+            if (!response.ok || !body.success) {
+                throw new Error(body.message || '요청을 처리하지 못했습니다.');
+            }
 
-                // 목표 구역으로 부드럽게 스크롤링
-                target.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start"
+            if (action === 'scrap') {
+                updateActionButton(saveButton, body.data.is_scrapped, '저장 완료', '저장하기');
+            } else {
+                updateActionButton(likeButton, body.data.is_liked, '도움 완료', '도움이 됐어요');
+            }
+        } catch (error) {
+            window.alert(error.message);
+        } finally {
+            button.disabled = false;
+        }
+    }
+
+    saveButton.addEventListener('click', () => toggleAction('scrap', saveButton));
+    likeButton.addEventListener('click', () => toggleAction('like', likeButton));
+
+    async function loadGuide() {
+        try {
+            const response = await fetch(`/api/guides/${guideId}/`, {
+                headers: { Accept: 'application/json' },
+                credentials: 'include',
+            });
+            const body = await response.json();
+            if (!response.ok || !body.success) {
+                throw new Error(body.message || '설명서를 불러오지 못했습니다.');
+            }
+
+            const guide = body.data;
+            document.title = `${guide.title} - 똑디`;
+            title.textContent = guide.title;
+            meta.textContent = `${guide.author} · 조회 ${guide.view_count}`;
+            updateActionButton(saveButton, guide.is_scrapped, '저장 완료', '저장하기');
+            updateActionButton(likeButton, guide.is_liked, '도움 완료', '도움이 됐어요');
+
+            if (guide.images.length === 0) {
+                const empty = document.createElement('p');
+                empty.className = 'detail-empty';
+                empty.textContent = '등록된 설명 단계가 없습니다.';
+                steps.appendChild(empty);
+                stepNavArea.hidden = true;
+            } else {
+                guide.images.forEach((imageData, index) => {
+                    steps.appendChild(createStep(imageData, index));
+                    stepNav.appendChild(createStepLink(index));
                 });
             }
-        });
-    });
+
+            statusText.hidden = true;
+            content.hidden = false;
+        } catch (error) {
+            statusText.textContent = error.message || '설명서를 불러오지 못했습니다.';
+        }
+    }
+
+    loadGuide();
 });

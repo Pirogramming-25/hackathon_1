@@ -2,8 +2,30 @@
 
 document.addEventListener('DOMContentLoaded', function () {
   var searchInput = document.getElementById('searchInput');
+  var searchForm = document.getElementById('searchForm');
   var hintChips = document.querySelectorAll('.hint-chip');
   var quickAskBtn = document.getElementById('quickAskBtn');
+
+  if (searchForm && searchInput) {
+    searchForm.addEventListener('submit', function (event) {
+      var keyword = searchInput.value.trim();
+
+      if (!keyword) {
+        event.preventDefault();
+        searchInput.setCustomValidity('검색어를 입력해주세요.');
+        searchInput.reportValidity();
+        searchInput.focus();
+        return;
+      }
+
+      searchInput.value = keyword;
+      searchInput.setCustomValidity('');
+    });
+
+    searchInput.addEventListener('input', function () {
+      searchInput.setCustomValidity('');
+    });
+  }
 
   // 힌트 예시를 누르면 검색창에 바로 채워주기 (노인 사용자가 직접 타이핑하지 않아도 되게)
   hintChips.forEach(function (chip) {
@@ -11,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
       var fillText = chip.getAttribute('data-fill');
       if (searchInput && fillText) {
         searchInput.value = fillText;
+        searchInput.setCustomValidity('');
         searchInput.focus();
       }
     });

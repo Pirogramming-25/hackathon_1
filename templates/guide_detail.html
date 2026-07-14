@@ -1,94 +1,55 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}카카오톡 증명서 발급 - 똑디{% endblock %}
+{% block title %}설명서 상세 - 똑디{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/guide_detail.css' %}">
+<link rel="stylesheet" href="{% static 'css/guide_detail.css' %}?v=2">
 {% endblock %}
 
 {% block content %}
 <div class="guide-detail-page page-wrap">
-    
-    <!-- 상단 헤더 영역 -->
-    <div class="detail-header">
-        <h1 class="detail-title">[ 카카오톡 증명서 발급하기 ]</h1>
-        <div class="header-actions">
-            <button type="button" class="save-btn">
-                <span class="material-symbols-rounded">bookmark</span> 저장하기
-            </button>
-            <button type="button" class="like-btn">
-                <span class="material-symbols-rounded">thumb_up</span> 도움이 됐어요
-            </button>
+    <button type="button" class="detail-back-btn" id="detailBackBtn">
+        <span class="material-symbols-rounded">chevron_left</span>
+        이전
+    </button>
+
+    <p class="detail-status" id="detailStatus" role="status">설명서를 불러오는 중입니다.</p>
+
+    <div id="guideDetailContent" hidden>
+        <div class="detail-header">
+            <div>
+                <h1 class="detail-title" id="guideTitle"></h1>
+                <p class="detail-meta" id="guideMeta"></p>
+            </div>
+            <div class="header-actions">
+                <button type="button" class="save-btn" id="saveBtn">
+                    <span class="material-symbols-rounded">bookmark</span>
+                    <span class="action-label">저장하기</span>
+                </button>
+                <button type="button" class="like-btn" id="likeBtn">
+                    <span class="material-symbols-rounded">thumb_up</span>
+                    <span class="action-label">도움이 됐어요</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="detail-layout">
+            <div class="content-area" id="guideSteps"></div>
+            <aside class="step-nav-area" id="stepNavArea">
+                <nav class="step-nav" id="stepNav" aria-label="설명서 단계"></nav>
+            </aside>
         </div>
     </div>
 
-    <!-- 메인 레이아웃 (좌측 콘텐츠 / 우측 스텝 고정 바) -->
-    <div class="detail-layout">
-        
-        <!-- 좌측: 시각적 스크린샷 및 설명 영역 -->
-        <div class="content-area">
-            
-            <!-- STEP 1 -->
-            <div id="step1" class="step-section">
-                <div class="step-card">
-                    <!-- 실제 이미지가 들어갈 자리 (시연용 회색 박스) -->
-                    <div class="step-image-placeholder">
-                        <!-- 나중에 백엔드에서 이미지 띄울 때 예시: <img src="{{ step.image.url }}" alt="1단계"> -->
-                    </div>
-                    <p class="step-desc">＞ 좌측 상단의 검색 버튼 누르기</p>
-                </div>
-            </div>
-
-            <!-- STEP 2 -->
-            <div id="step2" class="step-section">
-                <div class="step-card">
-                    <div class="step-image-placeholder"></div>
-                    <p class="step-desc">＞ 검색창에 '증명서'를 입력하고 아래로 내리세요.</p>
-                </div>
-            </div>
-
-            <!-- STEP 3 -->
-            <div id="step3" class="step-section">
-                <div class="step-card">
-                    <div class="step-image-placeholder"></div>
-                    <p class="step-desc">＞ 필요한 증명서를 선택한 후 발급 버튼을 누르세요.</p>
-                </div>
-            </div>
-
-            <!-- STEP 4 -->
-            <div id="step4" class="step-section">
-                <div class="step-card">
-                    <div class="step-image-placeholder"></div>
-                    <p class="step-desc">＞ 비밀번호를 입력하면 발급이 완료됩니다!</p>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- 우측: Duolingo처럼 친근하고 큼직한 숫자 네비게이션 바 -->
-        <aside class="step-nav-area">
-            <nav class="step-nav">
-                <!-- href의 ID와 좌측 step-section의 ID가 일치하여 스크롤이 이동합니다 -->
-                <a href="#step1" class="step-link active">1</a>
-                <a href="#step2" class="step-link">2</a>
-                <a href="#step3" class="step-link">3</a>
-                <a href="#step4" class="step-link">4</a>
-                <a href="#" class="step-link">5</a>
-                <a href="#" class="step-link">6</a>
-                <a href="#" class="step-link">7</a>
-                <a href="#" class="step-link">8</a>
-                <a href="#" class="step-link">9</a>
-                <a href="#" class="step-link">10</a>
-                <a href="#" class="step-link">11</a>
-            </nav>
-        </aside>
-
-    </div>
-
+    <form hidden>{% csrf_token %}</form>
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/guide_detail.js' %}"></script>
+<script>
+    window.DDOKDI_IS_AUTHENTICATED = {{ user.is_authenticated|yesno:"true,false" }};
+    window.DDOKDI_LOGIN_URL = "{% url 'login' %}";
+</script>
+<script src="{% static 'js/guide_detail.js' %}?v=2"></script>
 {% endblock %}

@@ -63,6 +63,11 @@ urlpatterns = [
         ),
         name="guide_page_list",
     ),
+    path(
+        "guides/<int:pk>/",
+        TemplateView.as_view(template_name="guide_detail.html"),
+        name="guide_page_detail",
+    ),
     path("login/", TemplateView.as_view(template_name="login.html"), name="login"),
     path("signup/", TemplateView.as_view(template_name="signup.html"), name="signup"),
     path("my-page/", TemplateView.as_view(template_name="my_page.html"), name="my_page"),

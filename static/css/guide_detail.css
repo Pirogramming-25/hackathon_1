@@ -7,6 +7,35 @@
     margin: 0 auto;
 }
 
+.detail-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin-bottom: 28px;
+    padding: 10px 16px 10px 10px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.detail-back-btn:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+}
+
+.detail-status,
+.detail-empty {
+    padding: 80px 20px;
+    color: var(--color-text-sub);
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+}
+
 /* --- 상단 헤더 --- */
 .detail-header {
     display: flex;
@@ -20,6 +49,12 @@
     font-size: var(--font-h2);
     font-weight: 800;
     color: var(--color-text);
+}
+
+.detail-meta {
+    margin-top: 10px;
+    color: var(--color-text-sub);
+    font-size: 16px;
 }
 
 .header-actions {
@@ -96,6 +131,20 @@
     margin-bottom: 24px;
 }
 
+.step-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 760px;
+    object-fit: contain;
+    background: var(--color-white);
+    border-radius: var(--radius-md);
+}
+
+.step-image + .step-desc {
+    margin-top: 24px;
+}
+
 .step-desc {
     font-size: 24px; /* 본문 20px보다 더 크고 선명하게 어르신 가시성 확보 */
     font-weight: 800;
@@ -144,6 +193,21 @@
 
 /* --- 반응형 레이아웃 --- */
 @media (max-width: 768px) {
+    .detail-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .header-actions {
+        width: 100%;
+    }
+
+    .header-actions button {
+        flex: 1;
+        padding: 0 12px;
+    }
+
     .detail-layout {
         flex-direction: column-reverse; /* 모바일 크기에선 네비가 위 혹은 아래로 빠지게 */
     }
