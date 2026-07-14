@@ -7,13 +7,20 @@
 
 {% block extra_css %}
 
-<link rel="stylesheet" href="{% static 'css/family_connect.css' %}">
+<link rel="stylesheet" href="{% static 'css/family_connect.css' %}?v=3">
 {% endblock %}
 
 {% block content %}
 
 <main class="family-page">
     {% csrf_token %}
+
+<div class="family-back-row">
+    <a href="{% url 'my_page' %}" class="family-back-btn" aria-label="내 정보 화면으로 돌아가기">
+        <span class="material-symbols-rounded">chevron_left</span>
+        이전
+    </a>
+</div>
 
 <section class="family-container">
 

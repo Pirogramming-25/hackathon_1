@@ -55,6 +55,19 @@ urlpatterns = [
     ),
 
     path("", TemplateView.as_view(template_name="home.html"), name="home"),
+    path(
+        "guides/",
+        TemplateView.as_view(
+            template_name="guide_list.html",
+            extra_context={"active_nav": "guide_list"},
+        ),
+        name="guide_page_list",
+    ),
+    path(
+        "guides/<int:pk>/",
+        TemplateView.as_view(template_name="guide_detail.html"),
+        name="guide_page_detail",
+    ),
     path("login/", TemplateView.as_view(template_name="login.html"), name="login"),
     path("signup/", TemplateView.as_view(template_name="signup.html"), name="signup"),
     path("my-page/", TemplateView.as_view(template_name="my_page.html"), name="my_page"),
@@ -68,7 +81,7 @@ urlpatterns = [
     path(
         "my-questions/",
         TemplateView.as_view(
-            template_name="my_quest.html", 
+            template_name="my_quest.html",
             extra_context={"active_nav": "storage"}, # 네비게이션 활성화 유지
         ),
         name="my_questions_page",

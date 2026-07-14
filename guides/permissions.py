@@ -1,5 +1,8 @@
 # guides/permissions.py
 from rest_framework import permissions
+from django.db.models import Q
+
+from families.models import FamilyRelation
 from .models import Visibility
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
@@ -23,8 +26,18 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
             # 공개글이면 누구나 볼 수 있음
             if obj.visibility == Visibility.PUBLIC:
                 return True
-            # 비공개글이면 오직 작성자 본인만 볼 수 있음
-            return obj.author == request.user
+            if obj.author == request.user:
+                return True
+
+            if not request.user.is_authenticated:
+                return False
+
+            # 수락된 가족 관계라면 작성자의 비공개 설명서도 조회 가능
+            return FamilyRelation.objects.filter(
+                Q(user1=request.user, user2=obj.author)
+                | Q(user1=obj.author, user2=request.user),
+                status=FamilyRelation.Status.ACCEPTED,
+            ).exists()
 
         # 2. 수정/삭제(PUT, PATCH, DELETE) 요청인 경우 무조건 작성자 본인만 가능
         return obj.author == request.user

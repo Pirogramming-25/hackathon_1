@@ -5,6 +5,7 @@ from django.db.models import Count, Exists, OuterRef, Q
 
 from .models import Guide, GuideLike, GuideScrap, Visibility
 from .serializers import GuideSerializer
+from families.models import FamilyRelation
 
 class MyGuideListView(generics.ListAPIView):
     serializer_class = GuideSerializer
@@ -40,11 +41,20 @@ class MyScrapListView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         queryset = Guide.objects.select_related('author').prefetch_related('images')
+
+        family_relations = FamilyRelation.objects.filter(
+            Q(user1=user) | Q(user2=user),
+            status=FamilyRelation.Status.ACCEPTED,
+        )
+        family_user_ids = [
+            relation.user2_id if relation.user1_id == user.id else relation.user1_id
+            for relation in family_relations
+        ]
         
         queryset = queryset.filter(
             Q(visibility=Visibility.PUBLIC) | 
             Q(author=user) | 
-            Q(shares__recipient=user)
+            Q(author_id__in=family_user_ids)
         ).filter(scraps__user=user).distinct()
         
         queryset = queryset.annotate(

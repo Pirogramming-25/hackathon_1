@@ -5,6 +5,34 @@
     padding-bottom: 80px;
     max-width: 1000px; /* 피그마 비율에 맞춘 넓이 */
     margin: 0 auto;
+    position: relative;
+}
+
+.guide-back-btn {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 112px;
+    min-height: 48px;
+    white-space: nowrap;
+    gap: 2px;
+    padding: 10px 16px 10px 10px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+.guide-back-btn:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
 }
 
 .page-title {
@@ -25,25 +53,41 @@
 .search-form {
     width: 100%;
     max-width: 600px;
+    position: relative;
 }
 
 .search-input {
     width: 100%;
     height: 60px;
-    padding: 0 30px;
+    padding: 0 72px 0 30px;
     font-size: 20px;
     font-weight: 700;
     color: var(--color-text);
     text-align: center; /* 피그마처럼 텍스트 중앙 정렬 */
-    border: 3px solid var(--color-primary);
+    border: 2px solid var(--color-border);
     border-radius: 30px;
     outline: none;
     background-color: var(--color-white);
-    transition: box-shadow var(--transition-base);
+    transition: border-color var(--transition-base);
+}
+
+.search-submit {
+    position: absolute;
+    top: 7px;
+    right: 8px;
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    color: var(--color-primary);
+    background: var(--color-primary-light);
+    cursor: pointer;
 }
 
 .search-input:focus {
-    box-shadow: 0 0 0 4px var(--color-primary-light);
+    border-color: var(--color-primary);
 }
 
 /* --- 필터 영역 --- */
@@ -83,6 +127,98 @@
     gap: 24px;
 }
 
+.guide-list-empty {
+    padding: 70px 20px;
+    text-align: center;
+}
+
+.guide-list-empty[hidden] {
+    display: none;
+}
+
+.guide-list-status {
+    color: var(--color-text-sub);
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.question-go-btn {
+    width: fit-content;
+    min-height: 50px;
+    margin: 24px auto 0;
+    padding: 0 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 999px;
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.question-go-btn[hidden] {
+    display: none;
+}
+
+.question-go-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(49, 130, 246, 0.25);
+}
+
+.guide-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 48px;
+}
+
+.guide-pagination[hidden] {
+    display: none;
+}
+
+.pagination-btn {
+    min-width: 100px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: var(--color-primary);
+    color: var(--color-white);
+}
+
+.pagination-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pagination-current {
+    min-width: 76px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-size: 18px;
+    font-weight: 800;
+}
+
 /* --- 개별 카드 스타일 --- */
 .guide-card {
     display: flex;
@@ -105,6 +241,42 @@
     background-color: #7B8289; /* 피그마의 짙은 회색 */
     border-radius: var(--radius-sm);
     margin-bottom: 16px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.visibility-badge {
+    position: absolute;
+    z-index: 1;
+    top: 10px;
+    left: 10px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    color: var(--color-white);
+    font-size: 14px;
+    font-weight: 800;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+}
+
+.visibility-badge.is-public {
+    background: var(--color-primary);
+}
+
+.visibility-badge.is-private {
+    background: #5f6872;
+}
+
+.card-image-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-placeholder-icon {
+    color: #d9dde1;
+    font-size: 54px;
 }
 
 .card-title {
@@ -124,6 +296,11 @@
 }
 
 @media (max-width: 600px) {
+    .guide-back-btn {
+        position: static;
+        margin-bottom: 20px;
+    }
+
     .guide-grid {
         grid-template-columns: repeat(2, 1fr);
     }
