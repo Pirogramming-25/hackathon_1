@@ -178,7 +178,7 @@ hackathon_1/
 ### 로컬 실행
 
 ```bash
-git clone <REPOSITORY_URL>
+git clone https://github.com/Pirogramming-25/hackathon_1.git
 cd hackathon_1
 
 python -m venv venv
