@@ -1,69 +1,252 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
 
-{% block title %}질문 작성{% endblock %}
+{% block title %}
+질문 등록
+{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/question_create.css' %}?v=6">
+<link
+    rel="stylesheet"
+    href="{% static 'css/question_create.css' %}"
+>
 {% endblock %}
 
 {% block content %}
-<section class="question-create-page">
-  <div class="question-create-header">
-    <button type="button" class="question-back-btn" id="questionBackBtn">
-      <span class="material-symbols-rounded">chevron_left</span>
-      이전
-    </button>
+<div class="question-create-page">
 
-    <h1>질문 작성</h1>
-  </div>
+    <div class="page-header">
+        <h1>질문 등록</h1>
+        <p>
+            어디에서, 무엇을 하다가 막히셨는지 알려주시면 더 빠르게 도와드릴 수 있어요.
+        </p>
+    </div>
 
-  <form id="question-create-form">
-    <label for="question-title">제목</label>
-    <input
-      type="text"
-      id="question-title"
-      maxlength="200"
-      required
+    <form
+        class="question-form"
+        id="questionCreateForm"
+        novalidate
     >
+        {% csrf_token %}
 
-    <label for="question-category">카테고리</label>
-    <select id="question-category" required>
-      <option value="">선택해주세요</option>
-      <option value="GOVERNMENT">정부</option>
-      <option value="FINANCE">금융</option>
-      <option value="MEDICAL">의료</option>
-      <option value="LIFE">생활</option>
-      <option value="ETC">기타</option>
-    </select>
+        <!-- 질문 제목 -->
+        <div class="form-group">
+            <label for="title">
+                어떤 게 궁금하신가요?
+            </label>
 
-    <label for="question-content">질문 내용</label>
-    <textarea
-      id="question-content"
-      rows="10"
-      required
-    ></textarea>
+            <input
+                type="text"
+                id="title"
+                name="title"
+                maxlength="200"
+                placeholder="예) 카카오톡에서 인증서 발급하다가 멈췄어요"
+                required
+            >
+        </div>
 
-    <label for="question-images">이미지 첨부</label>
-    <input
-      type="file"
-      id="question-images"
-      accept="image/jpeg,image/png,image/webp"
-      multiple
-    >
+        <!-- 카테고리 -->
+        <div class="form-group">
+            <label for="category">
+                분류
+            </label>
 
-    <div id="image-description-list"></div>
+            <select
+                id="category"
+                name="category"
+                required
+            >
+                <option
+                    value=""
+                    selected
+                    disabled
+                >
+                    분야를 선택해주세요.
+                </option>
 
-    <p id="question-form-error"></p>
+                <option value="GOVERNMENT">
+                    정부
+                </option>
 
-    <button type="submit" id="question-submit-button">
-      질문 등록
-    </button>
-  </form>
-</section>
+                <option value="FINANCE">
+                    금융
+                </option>
+
+                <option value="MEDICAL">
+                    의료
+                </option>
+
+                <option value="LIFE">
+                    생활
+                </option>
+
+                <option value="ETC">
+                    기타
+                </option>
+            </select>
+        </div>
+
+        <!-- 이미지 업로드 -->
+        <div class="form-group">
+            <label>
+                화면 사진
+            </label>
+
+            <label
+                for="imageInput"
+                class="upload-box"
+                id="uploadBox"
+            >
+                <span class="material-symbols-rounded upload-icon">
+                    add_photo_alternate
+                </span>
+
+                <h3>
+                    막힌 화면을 캡처해서 올려주세요.
+                </h3>
+
+                <p>
+                    클릭하거나 파일을 드래그하여 업로드
+                </p>
+
+                <small>
+                    JPG, PNG, WEBP · 파일당 5MB · 최대 20장
+                </small>
+
+                <input
+                    type="file"
+                    id="imageInput"
+                    multiple
+                    accept="image/jpeg,image/png,image/webp"
+                    hidden
+                >
+            </label>
+        </div>
+
+        <!-- 이미지가 한 장 이상 있을 때만 표시 -->
+        <section
+            id="imageEditorSection"
+            class="image-editor-section"
+            hidden
+        >
+            <div class="uploaded-images-header">
+                <div>
+                    <h2>
+                        등록한 화면
+                        <span id="imageCount">0</span>장
+                    </h2>
+
+                    <p>
+                        썸네일을 눌러 화면별로 막힌 부분을 표시하고 설명해주세요.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 업로드한 이미지 목록 -->
+            <div
+                id="thumbnailList"
+                class="thumbnail-list"
+                aria-label="등록한 화면 목록"
+            ></div>
+
+            <!-- 현재 선택한 이미지 편집 영역 -->
+            <div class="selected-image-editor">
+
+                <div class="selected-image-header">
+                    <div>
+                        <span class="selected-image-label">
+                            선택한 화면
+                        </span>
+
+                        <h3 id="selectedImageTitle">
+                            화면 1
+                        </h3>
+                    </div>
+
+                    <span
+                        id="selectedImageStatus"
+                        class="selected-image-status"
+                    >
+                        원본 이미지
+                    </span>
+                </div>
+
+                <div class="main-image-container">
+                    <img
+                        id="mainPreviewImage"
+                        src=""
+                        alt="현재 선택한 화면"
+                    >
+                </div>
+
+                <div class="image-edit-actions">
+                    <button
+                        type="button"
+                        id="annotateImageBtn"
+                        class="annotate-image-btn"
+                    >
+                        <span class="material-symbols-rounded">
+                            draw
+                        </span>
+
+                        <span id="annotateButtonText">
+                            그림으로 표시
+                        </span>
+                    </button>
+
+                    <button
+                        type="button"
+                        id="restoreOriginalBtn"
+                        class="restore-original-btn"
+                        hidden
+                    >
+                        <span class="material-symbols-rounded">
+                            restart_alt
+                        </span>
+
+                        원본으로 되돌리기
+                    </button>
+                </div>
+
+                <div class="image-description-group">
+                    <label for="imageDescription">
+                        이 화면에서 무엇이 궁금하신가요?
+                    </label>
+
+                    <textarea
+                        id="imageDescription"
+                        maxlength="2000"
+                        rows="4"
+                        placeholder="예) 이 버튼을 눌러도 다음 화면으로 안 넘어가요."
+                    ></textarea>
+
+                    <p>
+                        썸네일을 바꾸면 각 화면의 설명도 따로 저장됩니다.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <p
+            id="questionCreateError"
+            class="form-error"
+            role="alert"
+        ></p>
+
+        <div class="submit-area">
+            <button
+                type="submit"
+                class="next-btn"
+                id="saveQuestionBtn"
+            >
+                질문 등록하기
+            </button>
+        </div>
+    </form>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script src="{% static 'js/image-annotator.js' %}"></script>
-<script src="{% static 'js/question_create.js' %}?v=2"></script>
+<script src="{% static 'js/question_create.js' %}"></script>
 {% endblock %}
