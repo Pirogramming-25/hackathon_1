@@ -55,6 +55,14 @@ urlpatterns = [
     ),
 
     path("", TemplateView.as_view(template_name="home.html"), name="home"),
+    path(
+        "guides/",
+        TemplateView.as_view(
+            template_name="guide_list.html",
+            extra_context={"active_nav": "guide_list"},
+        ),
+        name="guide_page_list",
+    ),
     path("login/", TemplateView.as_view(template_name="login.html"), name="login"),
     path("signup/", TemplateView.as_view(template_name="signup.html"), name="signup"),
     path("my-page/", TemplateView.as_view(template_name="my_page.html"), name="my_page"),

@@ -15,7 +15,7 @@
 
     <h1 class="text-h1 home-hero__title">무엇이 궁금하신가요?</h1>
 
-    <form action="/api/guides/" method="get" class="search-box" id="searchForm">
+    <form action="{% url 'guide_page_list' %}" method="get" class="search-box" id="searchForm">
       <button type="button"
               class="search-box__plus"
               id="quickAskBtn"

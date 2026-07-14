@@ -14,37 +14,30 @@
 
     <!-- 검색 영역 (피그마처럼 파란 테두리 라운드 박스) -->
     <div class="search-section">
-        <form action="#" method="GET" class="search-form">
+        <form action="{% url 'guide_page_list' %}" method="GET" class="search-form" id="guideSearchForm">
             <input 
                 type="text" 
                 name="q" 
                 class="search-input" 
-                value="카카오톡 증명서 발급" 
+                id="guideSearchInput"
                 placeholder="검색어를 입력해주세요"
+                autocomplete="off"
             >
+            <button type="submit" class="search-submit" aria-label="설명서 검색">
+                <span class="material-symbols-rounded">search</span>
+            </button>
         </form>
     </div>
 
     <!-- 필터 영역 (우측 정렬된 둥근 버튼 3개) -->
     <div class="filter-section">
-        <button type="button" class="filter-btn active">최신순</button>
-        <button type="button" class="filter-btn">저장순</button>
-        <button type="button" class="filter-btn">조회순</button>
+        <button type="button" class="filter-btn active" data-sort="latest">최신순</button>
+        <button type="button" class="filter-btn" data-sort="most_scrapped">저장순</button>
     </div>
 
     <!-- 카드 그리드 영역 (4열 배치) -->
-    <div class="guide-grid">
-        
-        <!-- 프론트엔드 시연용 임시 카드 8개 -->
-        {% for i in "12345678" %}
-        <a href="#" class="guide-card">
-            <!-- 회색 박스 (이미지 들어갈 자리) -->
-            <div class="card-image-placeholder"></div>
-            <!-- 카드 제목 -->
-            <h3 class="card-title">카카오톡 증명서 발급</h3>
-        </a>
-        {% endfor %}
-
+    <p class="guide-list-status" id="guideListStatus" role="status">설명서를 불러오는 중입니다.</p>
+    <div class="guide-grid" id="guideGrid">
     </div>
 
 </div>
