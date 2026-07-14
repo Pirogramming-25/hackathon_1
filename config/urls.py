@@ -73,7 +73,22 @@ urlpatterns = [
         TemplateView.as_view(template_name="family_connect.html"),
         name="family_connect",
     ),
+    path(
+        "my-questions/",
+        TemplateView.as_view(
+            template_name="my_quest.html",
+            extra_context={"active_nav": "storage"}, # 네비게이션 활성화 유지
+        ),
+        name="my_questions_page",
+    ),
 
+    path("guide-create/", TemplateView.as_view(template_name="guide_create_1.html"), name="guide_create"),
+
+    path(
+    "guide-create-2/",
+    TemplateView.as_view(template_name="guide_create_2.html"),
+    name="guide_create_2",
+    ),
     
     path("api/", index),
     path("admin/", admin.site.urls),

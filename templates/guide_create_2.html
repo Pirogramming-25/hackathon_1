@@ -14,7 +14,7 @@
     
     <div class="page-header">
         <h1>설명서 작성 2. 사진 편집</h1>
-        <p>사진에서 강조할 부분을 클릭하여 빨간 동그라미와 주석을 달아주세요.</p>
+        <p>사진 아래 "그림으로 표시" 버튼을 눌러 강조할 부분에 동그라미, 화살표, 텍스트를 추가해주세요.</p>
     </div>
 
     <!-- 상단 썸네일 네비게이션 (업로드한 사진 목록) -->
@@ -23,18 +23,22 @@
     </div>
 
     <div class="edit-section">
-        <!-- 1. 사진 위 주석(동그라미) 편집 영역 -->
+        <!-- 1. 사진 위 주석(동그라미/화살표/텍스트) 편집 영역 -->
         <div class="form-group">
-            <label>화면 사진 (클릭하여 주석 추가)</label>
-            
+            <label>화면 사진</label>
+
             <div class="canvas-container" id="canvasContainer">
                 <!-- 선택된 메인 이미지 -->
                 <img id="mainImage" src="" alt="편집 중인 화면">
-                
-                <!-- JS 이벤트: 사용자가 이미지를 클릭하면 
-                     이 컨테이너 안에 빨간 동그라미(div)와 
-                     텍스트 입력창(input)이 절대위치(absolute)로 추가됩니다. -->
             </div>
+
+            <button
+                type="button"
+                id="annotateImageBtn"
+                class="btn btn-outline annotate-image-btn"
+            >
+                ✏️ 그림으로 표시
+            </button>
         </div>
 
         <!-- 2. 하단 줄글 설명 영역 -->
@@ -65,5 +69,6 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'js/image-annotator.js' %}"></script>
 <script src="{% static 'js/guide_create_2.js' %}"></script>
 {% endblock %}
