@@ -9,6 +9,77 @@ function bindImageDescriptions() {
     "#image-description-list"
   );
 
+  function renderList() {
+    // 기존에 입력해둔 설명 텍스트는 유지한 채로 다시 그린다.
+    const previousDescriptions = Array.from(
+      document.querySelectorAll(".image-description")
+    ).map((input) => input.value);
+
+    const files = Array.from(imageInput.files);
+
+    descriptionList.innerHTML = files
+      .map(
+        (file, index) => `
+          <div class="image-description-item">
+            <p>${escapeHtml(file.name)}</p>
+
+            <div class="image-description-row">
+              <input
+                type="text"
+                class="image-description"
+                data-index="${index}"
+                placeholder="이미지 설명을 입력하세요. 선택 사항"
+                value="${escapeHtml(previousDescriptions[index] ?? "")}"
+              >
+              <button
+                type="button"
+                class="image-annotate-btn"
+                data-index="${index}"
+              >
+                ✏️ 그림으로 표시
+              </button>
+            </div>
+          </div>
+        `
+      )
+      .join("");
+
+    descriptionList
+      .querySelectorAll(".image-annotate-btn")
+      .forEach((button) => {
+        button.addEventListener("click", async () => {
+          const index = Number(button.dataset.index);
+          const currentFiles = Array.from(imageInput.files);
+          const targetFile = currentFiles[index];
+
+          if (!targetFile) {
+            return;
+          }
+
+          const originalText = button.textContent;
+          button.disabled = true;
+          button.textContent = "편집 중...";
+
+          const bakedFile = await openImageAnnotator(targetFile);
+
+          button.disabled = false;
+          button.textContent = originalText;
+
+          if (!bakedFile) {
+            return; // 취소한 경우 원본 유지
+          }
+
+          const dataTransfer = new DataTransfer();
+          currentFiles.forEach((file, i) => {
+            dataTransfer.items.add(i === index ? bakedFile : file);
+          });
+          imageInput.files = dataTransfer.files;
+
+          renderList();
+        });
+      });
+  }
+
   imageInput.addEventListener("change", () => {
     const files = Array.from(imageInput.files);
 
@@ -30,22 +101,7 @@ function bindImageDescriptions() {
       return;
     }
 
-    descriptionList.innerHTML = files
-      .map(
-        (file, index) => `
-          <div class="image-description-item">
-            <p>${escapeHtml(file.name)}</p>
-
-            <input
-              type="text"
-              class="image-description"
-              data-index="${index}"
-              placeholder="이미지 설명을 입력하세요. 선택 사항"
-            >
-          </div>
-        `
-      )
-      .join("");
+    renderList();
   });
 }
 
