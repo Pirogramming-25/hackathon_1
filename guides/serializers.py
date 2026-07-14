@@ -106,28 +106,62 @@ class GuideSerializer(serializers.ModelSerializer):
 class GuidePromoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Guide
-        # 승격 시에는 파일 업로드 필드를 무시하고 기본 정보만 받습니다.
-        fields = ['id', 'title', 'category', 'visibility'] 
+        fields = ["id", "title", "category", "visibility"]
 
     def create(self, validated_data):
-        answer = self.context.get('answer')
-        
+        answer = self.context["answer"]
+
         with transaction.atomic():
-            # [추가] source_answer 연결 (중복 승격 방지용 출처 기록)
-            guide = Guide.objects.create(source_answer=answer, **validated_data)
-            
-            # 기존 답변 이미지 물리적 복사 로직 (그대로 유지)
-            if hasattr(answer, 'images'):
-                answer_images = answer.images.all().order_by('display_order')
-                for a_img in answer_images:
-                    g_img = GuideImage(
-                        guide=guide, 
-                        description=a_img.description, 
-                        display_order=a_img.display_order,
-                        is_baked=False
+            guide = Guide.objects.create(
+                source_answer=answer,
+                **validated_data,
+            )
+
+            answer_images = list(
+                answer.images.all().order_by("display_order")
+            )
+
+            if answer_images:
+                for index, answer_image in enumerate(answer_images, start=1):
+                    image_description = answer_image.description.strip()
+
+                    if index == 1:
+                        description_parts = [
+                            value
+                            for value in [
+                                answer.content.strip(),
+                                image_description,
+                            ]
+                            if value
+                        ]
+                        description = "\n\n".join(description_parts)
+                    else:
+                        description = image_description
+
+                    guide_image = GuideImage(
+                        guide=guide,
+                        description=description,
+                        display_order=index,
+                        is_baked=False,
                     )
-                    file_name = a_img.image.name.split('/')[-1]
-                    g_img.image.save(file_name, a_img.image.file, save=True)
+
+                    file_name = os.path.basename(answer_image.image.name)
+
+                    guide_image.image.save(
+                        file_name,
+                        answer_image.image.file,
+                        save=True,
+                    )
+
+            else:
+                GuideImage.objects.create(
+                    guide=guide,
+                    image=None,
+                    description=answer.content.strip(),
+                    display_order=1,
+                    is_baked=False,
+                )
+
         return guide
 
 # --------------------------------------------------------

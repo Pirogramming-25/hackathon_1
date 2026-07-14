@@ -75,9 +75,11 @@ document.addEventListener('DOMContentLoaded', () => {
         visibility.textContent = guide.visibility === 'PRIVATE' ? '비공개' : '공개';
         imageWrap.appendChild(visibility);
 
-        if (guide.images && guide.images.length > 0) {
+        const thumbnailUrl = guide.images?.[0]?.image;
+
+        if (thumbnailUrl) {
             const image = document.createElement('img');
-            image.src = guide.images[0].image;
+            image.src = thumbnailUrl;
             image.alt = `${guide.title} 대표 이미지`;
             image.loading = 'lazy';
             imageWrap.appendChild(image);
@@ -85,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const icon = document.createElement('span');
             icon.className = 'material-symbols-rounded card-placeholder-icon';
             icon.textContent = 'description';
-            imageWrap.appendChild(icon);
+        imageWrap.appendChild(icon);
         }
 
         const title = document.createElement('h3');

@@ -840,15 +840,15 @@ async function submitGuide(event) {
     }
 
     alert(
-      result?.message ||
-      "설명서가 등록되었습니다."
+        result?.message ||
+        "설명서가 등록되었습니다."
     );
 
-    /*
-     * 현재 동적 설명서 상세 페이지가 없으므로
-     * 일단 홈으로 이동한다.
-     */
-    window.location.href = "/";
+    const createdGuideId = result?.data?.id;
+
+    window.location.href = createdGuideId
+        ? `/guides/${createdGuideId}/`
+        : "/guides/";
   } catch (error) {
     console.error(
       "설명서 등록 오류:",
