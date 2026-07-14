@@ -8,20 +8,20 @@
 {% endblock %}
 
 {% block content %}
-<main class="question-list-page">
+<main class="question-list-page page-wrap">
     <section class="question-list-header">
         <div>
             <h1>질문 목록</h1>
             <p>디지털 사용 중 궁금한 내용을 확인하세요.</p>
         </div>
-
-        <a href="{% url 'question_create' %}" class="question-create-btn">
+        <a href="{% url 'question_create' %}" class="btn btn-primary question-create-btn">
             질문 등록
         </a>
     </section>
 
-    <section id="question-list">
-        <p>질문을 불러오는 중입니다.</p>
+    <!-- 기존 ID 유지, 여기에 JS로 카드가 추가됩니다 -->
+    <section id="question-list" class="question-grid">
+        <p class="loading-msg">질문을 불러오는 중입니다.</p>
     </section>
 
     <div id="pagination"></div>
