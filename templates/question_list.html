@@ -17,23 +17,9 @@
     <p class="text-body question-list-desc">디지털 사용 중 궁금한 내용을 확인해보세요.</p>
   </div>
 
-  <form class="question-search" id="questionSearchForm">
-    <input type="text"
-           name="q"
-           id="questionSearchInput"
-           class="question-search__input"
-           placeholder="궁금한 내용을 검색해보세요"
-           autocomplete="off">
-    <button type="submit" class="question-search__submit" aria-label="검색하기">
-      <span class="material-symbols-rounded">search</span>
-    </button>
-  </form>
 
   <div class="question-toolbar">
     <div class="question-sort" role="group" aria-label="정렬 방법 선택">
-      <button type="button" class="sort-btn is-active" data-sort="latest">최신순</button>
-      <button type="button" class="sort-btn" data-sort="saved">저장순</button>
-      <button type="button" class="sort-btn" data-sort="views">조회순</button>
     </div>
 
     <a href="{% url 'question_create' %}" class="btn btn-primary question-create-btn">
