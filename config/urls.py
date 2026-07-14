@@ -73,6 +73,14 @@ urlpatterns = [
         ),
         name="my_questions_page",
     ),
+    path(
+        "my-create/",
+        TemplateView.as_view(
+            template_name="my_create.html", 
+            extra_context={"active_nav": "storage"}, # 네비게이션 북마크 아이콘 활성화
+        ),
+        name="my_create_page",
+    ),
 
     path("guide-create/", TemplateView.as_view(template_name="guide_create_1.html"), name="guide_create"),
 
