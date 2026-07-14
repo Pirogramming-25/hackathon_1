@@ -1,6 +1,7 @@
 console.log("question_detail.js 파일 실행됨");
 
 document.addEventListener("DOMContentLoaded", () => {
+  bindBackButton();
   loadQuestionDetail();
   bindAnswerForm();
   bindAnswerImageDescriptions();
@@ -13,18 +14,39 @@ function getQuestionId() {
     .at(-1);
 }
 
+/* 설명서 상세와 동일한 '이전' 버튼 동작 */
+function bindBackButton() {
+  const backButton = document.querySelector("#detailBackBtn");
+
+  if (!backButton) {
+    return;
+  }
+
+  backButton.addEventListener("click", () => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = "/questions/";
+    }
+  });
+}
+
 async function loadQuestionDetail() {
+  const statusText = document.querySelector("#detailStatus");
   const questionDetail = document.querySelector("#question-detail");
   const answerList = document.querySelector("#answer-list");
   const questionId = getQuestionId();
 
-  if (!questionDetail || !answerList) {
+  if (!questionDetail || !answerList || !statusText) {
     console.error("질문 상세 화면 요소를 찾을 수 없습니다.");
     return;
   }
 
   if (!questionId || Number.isNaN(Number(questionId))) {
-    questionDetail.innerHTML = "<p>잘못된 질문 주소입니다.</p>";
+    statusText.textContent = "잘못된 질문 주소입니다.";
+    statusText.classList.add("is-error");
+    statusText.hidden = false;
+    questionDetail.hidden = true;
     answerList.innerHTML = "";
     return;
   }
@@ -49,17 +71,21 @@ async function loadQuestionDetail() {
       throw new Error("질문 데이터가 없습니다.");
     }
 
+    document.title = `${question.title} - 똑디`;
+
     renderQuestion(question);
     renderAnswers(question);
     updateAnswerForm(question);
+
+    statusText.hidden = true;
+    questionDetail.hidden = false;
   } catch (error) {
     console.error("질문 상세 조회 오류:", error);
 
-    questionDetail.innerHTML = `
-      <p class="error-message">
-        ${escapeHtml(error.message)}
-      </p>
-    `;
+    statusText.textContent = error.message || "질문을 불러오지 못했습니다.";
+    statusText.classList.add("is-error");
+    statusText.hidden = false;
+    questionDetail.hidden = true;
 
     answerList.innerHTML = "";
   }
@@ -76,61 +102,60 @@ function renderQuestion(question) {
     Boolean(currentUsername) &&
     question.author === currentUsername;
 
+  const isResolved = question.status === "RESOLVED";
+
   questionDetail.innerHTML = `
-    <article class="question-detail-card">
-      <div class="question-detail-labels">
-        <span class="question-category">
-          ${escapeHtml(getCategoryLabel(question.category))}
-        </span>
+    <div class="detail-header">
+      <div>
+        <div class="question-detail-labels">
+          <span class="question-category">
+            ${escapeHtml(getCategoryLabel(question.category))}
+          </span>
 
-        <span class="question-status">
-          ${escapeHtml(getStatusLabel(question.status))}
-        </span>
-      </div>
+          <span class="question-status ${isResolved ? "is-resolved" : ""}">
+            ${escapeHtml(getStatusLabel(question.status))}
+          </span>
+        </div>
 
-      <h1 class="question-detail-title">
-        ${escapeHtml(question.title)}
-      </h1>
-
-      <div class="question-detail-meta">
-        <span>${escapeHtml(question.author)}</span>
-        <span>${formatDate(question.created_at)}</span>
+        <h1 class="detail-title">${escapeHtml(question.title)}</h1>
+        <p class="detail-meta">
+          ${escapeHtml(question.author)} · ${formatDate(question.created_at)}
+        </p>
       </div>
 
       ${
         isAuthor
           ? `
-            <div class="question-actions">
+            <div class="header-actions">
               ${
                 question.status !== "RESOLVED"
                   ? `
-                    <button
-                      type="button"
-                      id="question-resolve-btn"
-                    >
+                    <button type="button" id="question-resolve-btn">
+                      <span class="material-symbols-rounded">check_circle</span>
                       해결 완료
                     </button>
                   `
                   : ""
               }
 
-              <button
-                type="button"
-                id="question-delete-btn"
-              >
+              <button type="button" id="question-delete-btn">
+                <span class="material-symbols-rounded">delete</span>
                 질문 삭제
               </button>
             </div>
           `
           : ""
       }
+    </div>
 
-      <p class="question-detail-content">
-        ${escapeHtml(question.content)}
-      </p>
-
-      ${renderImages(question.images ?? [])}
-    </article>
+    <div class="detail-layout">
+      <div class="content-area">
+        <div class="question-content-card">
+          <p class="question-detail-content">${escapeHtml(question.content)}</p>
+          ${renderImages(question.images ?? [])}
+        </div>
+      </div>
+    </div>
   `;
 
   document
@@ -376,6 +401,7 @@ function renderImages(images) {
             alt="${escapeHtml(
               image.description ?? "첨부 이미지"
             )}"
+            loading="lazy"
           >
 
           ${
@@ -453,7 +479,8 @@ function bindAnswerImageDescriptions() {
                 class="answer-image-annotate-btn"
                 data-index="${index}"
               >
-                ✏️ 그림으로 표시
+                <span class="material-symbols-rounded">draw</span>
+                그림으로 표시
               </button>
             </div>
           </div>
@@ -473,14 +500,14 @@ function bindAnswerImageDescriptions() {
             return;
           }
 
-          const originalText = button.textContent;
+          const originalHtml = button.innerHTML;
           button.disabled = true;
           button.textContent = "편집 중...";
 
           const bakedFile = await openImageAnnotator(targetFile);
 
           button.disabled = false;
-          button.textContent = originalText;
+          button.innerHTML = originalHtml;
 
           if (!bakedFile) {
             return;
@@ -588,6 +615,8 @@ function bindAnswerForm() {
         formData.append("image_descriptions", description);
     });
 
+    const originalButtonText = submitButton.textContent;
+
     try {
       submitButton.disabled = true;
       submitButton.textContent = "등록 중...";
@@ -641,7 +670,7 @@ function bindAnswerForm() {
       alert(error.message);
     } finally {
       submitButton.disabled = false;
-      submitButton.textContent = "답변 등록";
+      submitButton.textContent = originalButtonText;
     }
   });
 }
@@ -860,7 +889,9 @@ function moveToLogin() {
     window.location.pathname
   );
 
-  window.location.href = `/login/?next=${nextPath}`;
+  const loginUrl = window.DDOKDI_LOGIN_URL || "/login/";
+
+  window.location.href = `${loginUrl}?next=${nextPath}`;
 }
 
 function getCookie(name) {
