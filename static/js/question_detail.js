@@ -3,6 +3,7 @@ console.log("question_detail.js 파일 실행됨");
 document.addEventListener("DOMContentLoaded", () => {
   loadQuestionDetail();
   bindAnswerForm();
+  bindAnswerImageDescriptions();
 });
 
 function getQuestionId() {
@@ -179,14 +180,26 @@ function renderAnswers(question) {
           </button>
         `
         : "";
+        const isAnswerAuthor =
+        Boolean(currentUsername) &&
+        answer.author === currentUsername;
+
+        const editDeleteButtons = isAnswerAuthor
+        ? `
+          <div class="answer-owner-actions">
+            <button type="button" class="answer-edit-btn" data-answer-id="${answer.id}">수정</button>
+            <button type="button" class="answer-delete-btn" data-answer-id="${answer.id}">삭제</button>
+          </div>
+        `
+        : "";
 
       return `
-        <article class="answer-card">
+        <article class="answer-card" data-answer-id="${answer.id}">
           <div class="answer-card-header">
             <strong>${escapeHtml(answer.author)}</strong>
           </div>
 
-          <p class="answer-content">
+          <p class="answer-content" data-role="answer-content-display">
             ${escapeHtml(answer.content)}
           </p>
 
@@ -197,15 +210,10 @@ function renderAnswers(question) {
               ${formatDate(answer.created_at)}
             </time>
 
-            ${
-              registerButton
-                ? `
-                  <div class="answer-actions">
-                    ${registerButton}
-                  </div>
-                `
-                : ""
-            }
+            <div class="answer-actions">
+              ${editDeleteButtons}
+              ${registerButton}
+            </div>
           </div>
         </article>
       `;
@@ -223,6 +231,125 @@ function renderAnswers(question) {
         );
       });
     });
+
+  answerList
+    .querySelectorAll(".answer-edit-btn")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        startEditAnswer(button.dataset.answerId);
+      });
+    });
+
+  answerList
+    .querySelectorAll(".answer-delete-btn")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        deleteAnswer(button.dataset.answerId);
+      });
+    });
+}
+
+function startEditAnswer(answerId) {
+  const card = document.querySelector(
+    `.answer-card[data-answer-id="${answerId}"]`
+  );
+  const contentDisplay = card?.querySelector(
+    '[data-role="answer-content-display"]'
+  );
+
+  if (!contentDisplay || card.querySelector(".answer-edit-form")) {
+    return;
+  }
+
+  const originalText = contentDisplay.textContent.trim();
+
+  const editForm = document.createElement("div");
+  editForm.className = "answer-edit-form";
+  editForm.innerHTML = `
+    <textarea class="answer-edit-textarea" rows="5">${escapeHtml(
+      originalText
+    )}</textarea>
+    <div class="answer-edit-actions">
+      <button type="button" class="answer-edit-save-btn">저장</button>
+      <button type="button" class="answer-edit-cancel-btn">취소</button>
+    </div>
+  `;
+
+  contentDisplay.hidden = true;
+  contentDisplay.insertAdjacentElement("afterend", editForm);
+
+  editForm
+    .querySelector(".answer-edit-cancel-btn")
+    .addEventListener("click", () => {
+      editForm.remove();
+      contentDisplay.hidden = false;
+    });
+
+  editForm
+    .querySelector(".answer-edit-save-btn")
+    .addEventListener("click", () => {
+      const value = editForm
+        .querySelector(".answer-edit-textarea")
+        .value.trim();
+      saveAnswerEdit(answerId, value, editForm, contentDisplay);
+    });
+}
+
+async function saveAnswerEdit(answerId, content, editForm, contentDisplay) {
+  if (!content) {
+    alert("답변 내용을 입력해주세요.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("content", content);
+
+  const response = await fetch(`/api/answers/${answerId}/`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: { "X-CSRFToken": getCookie("csrftoken") },
+    body: formData,
+  });
+
+  const result = await parseResponse(response);
+
+  if (response.status === 401 || response.status === 403) {
+    moveToLogin();
+    return;
+  }
+
+  if (!response.ok || result?.success === false) {
+    alert(getErrorMessage(result) || "답변 수정에 실패했습니다.");
+    return;
+  }
+
+  await loadQuestionDetail();
+}
+
+async function deleteAnswer(answerId) {
+  if (!confirm("이 답변을 정말 삭제하시겠습니까?")) {
+    return;
+  }
+
+  const response = await fetch(`/api/answers/${answerId}/`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: { "X-CSRFToken": getCookie("csrftoken") },
+  });
+
+  const result = await parseResponse(response);
+
+  if (response.status === 401 || response.status === 403) {
+    moveToLogin();
+    return;
+  }
+
+  if (!response.ok || result?.success === false) {
+    alert(getErrorMessage(result) || "답변 삭제에 실패했습니다.");
+    return;
+  }
+
+  await loadQuestionDetail();
 }
 
 function renderImages(images) {
@@ -290,7 +417,43 @@ function updateAnswerForm(question) {
 
   answerForm.hidden = false;
 }
+function bindAnswerImageDescriptions() {
+  const imageInput = document.querySelector("#answer-images");
+  const descriptionList = document.querySelector(
+    "#answer-image-description-list"
+  );
 
+  if (!imageInput || !descriptionList) {
+    return;
+  }
+
+  imageInput.addEventListener("change", () => {
+    const files = Array.from(imageInput.files);
+
+    if (files.length > 4) {
+      alert("답변 이미지는 최대 4장까지 등록할 수 있습니다.");
+      imageInput.value = "";
+      descriptionList.innerHTML = "";
+      return;
+    }
+
+    descriptionList.innerHTML = files
+      .map(
+        (file, index) => `
+          <div class="answer-image-description-item">
+            <p>${escapeHtml(file.name)}</p>
+            <input
+              type="text"
+              class="answer-image-description"
+              data-index="${index}"
+              placeholder="이미지 설명을 입력하세요. 선택 사항"
+            >
+          </div>
+        `
+      )
+      .join("");
+  });
+}
 function bindAnswerForm() {
   const answerForm = document.querySelector("#answer-form");
 
@@ -344,9 +507,17 @@ function bindAnswerForm() {
 
     formData.append("content", content);
 
-    files.forEach((file) => {
-      formData.append("images", file);
-      formData.append("image_descriptions", "");
+    const descriptionInputs = Array.from(
+        document.querySelectorAll(".answer-image-description")
+    );
+
+    files.forEach((file, index) => {
+        formData.append("images", file);
+
+        const description =
+            descriptionInputs[index]?.value.trim() ?? "";
+
+        formData.append("image_descriptions", description);
     });
 
     try {
