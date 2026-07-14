@@ -61,7 +61,7 @@
 
 
       {% if user.is_authenticated %}
-        <form action="/api/auth/logout/" method="post" style="margin-left:auto;">
+        <form id="logout-form" action="/api/auth/logout/" method="post" style="margin-left:auto;">
           {% csrf_token %}
           <button type="submit" class="nav-btn nav-btn-exit">
             <span class="material-symbols-rounded">logout</span> 로그아웃
@@ -83,6 +83,39 @@
 
 </div>
 
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const logoutForm = document.querySelector("#logout-form");
+
+    if (!logoutForm) {
+      return;
+    }
+
+    logoutForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const csrfToken = logoutForm.querySelector(
+        'input[name="csrfmiddlewaretoken"]'
+      ).value;
+
+      try {
+        await fetch(logoutForm.action, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "X-CSRFToken": csrfToken,
+          },
+        });
+      } catch (error) {
+        console.error("로그아웃 요청 오류:", error);
+      } finally {
+        window.location.href = "{% url 'home' %}";
+      }
+    });
+  });
+</script>
+
 {% block extra_js %}{% endblock %}
+
 </body>
 </html>

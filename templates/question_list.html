@@ -8,14 +8,14 @@
 {% endblock %}
 
 {% block content %}
-<main class="question-page">
-    <section class="question-header">
+<main class="question-list-page">
+    <section class="question-list-header">
         <div>
             <h1>질문 목록</h1>
             <p>디지털 사용 중 궁금한 내용을 확인하세요.</p>
         </div>
 
-        <a href="{% url 'question_create' %}" class="question-create-link">
+        <a href="{% url 'question_create' %}" class="question-create-btn">
             질문 등록
         </a>
     </section>
