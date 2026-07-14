@@ -74,6 +74,13 @@ urlpatterns = [
         name="my_questions_page",
     ),
 
+    path("guide-create/", TemplateView.as_view(template_name="guide_create_1.html"), name="guide_create"),
+
+    path(
+    "guide-create-2/",
+    TemplateView.as_view(template_name="guide_create_2.html"),
+    name="guide_create_2",
+    ),
     
     path("api/", index),
     path("admin/", admin.site.urls),
