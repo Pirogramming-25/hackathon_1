@@ -21,17 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let searchTimer = null;
     let requestController = null;
 
-    function updatePageHeading() {
-        if (keyword) {
-            pageTitle.textContent = '검색 결과';
-            document.title = `${keyword} 검색 결과 - 똑디`;
-        } else {
-            pageTitle.textContent = '설명서 목록';
-            document.title = '설명서 목록 - 똑디';
-        }
-    }
-
-    updatePageHeading();
+    pageTitle.textContent = '설명서 목록';
+    document.title = '설명서 목록 - 똑디';
 
     backButton.addEventListener('click', () => {
         if (window.history.length > 1) {
@@ -68,7 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
             ? `/guides/?q=${encodeURIComponent(keyword)}`
             : '/guides/';
         window.history.replaceState({}, '', nextUrl);
-        updatePageHeading();
         loadGuides(1);
     }
 
