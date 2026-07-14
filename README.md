@@ -205,7 +205,8 @@ docker compose up --build
 ```bash
 python manage.py test
 ```
-
+### 배포 링크
+`https://hackathon-1-irz4.onrender.com `
 ---
 
 ## 🎯 프로젝트 목표
