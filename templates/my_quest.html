@@ -6,12 +6,17 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/my_quest.css' %}">
+<link rel="stylesheet" href="{% static 'css/my_quest.css' %}?v=2">
 {% endblock %}
 
 {% block content %}
 
 <div class="my-quest-page">
+
+    <a href="{% url 'my_save' %}" class="my-quest-back-btn">
+        <span class="material-symbols-rounded">chevron_left</span>
+        이전
+    </a>
 
     <div class="page-header">
 
@@ -31,8 +36,10 @@
 
     <div id="pagination" class="pagination-container"></div>
 
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/my_quest.js' %}"></script>
+<script src="{% static 'js/my_quest.js' %}?v=2"></script>
 {% endblock %}

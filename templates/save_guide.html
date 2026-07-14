@@ -6,19 +6,24 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/save_guide.css' %}">
+<link rel="stylesheet" href="{% static 'css/save_guide.css' %}?v=2">
 {% endblock %}
 
 {% block content %}
 
 <div class="save-guid-page">
 
+    <a href="{% url 'my_save' %}" class="save-guide-back-btn">
+        <span class="material-symbols-rounded">chevron_left</span>
+        이전
+    </a>
+
     <div class="page-header">
         <h1>저장한 설명서</h1>
         <p>나중에 다시 보고 싶은 설명서를 모아볼 수 있습니다.</p>
     </div>
 
-    
+    <section id="scrap-list" class="guide-grid"></section>
     
     <div id="pagination" class="pagination-container"></div>
 
@@ -27,5 +32,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/save_guide.js' %}"></script>
+<script src="{% static 'js/save_guide.js' %}?v=2"></script>
 {% endblock %}
