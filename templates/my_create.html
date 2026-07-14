@@ -6,12 +6,17 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/my_create.css' %}">
+<link rel="stylesheet" href="{% static 'css/my_create.css' %}?v=2">
 {% endblock %}
 
 {% block content %}
 
 <div class="my-create-page">
+
+    <a href="{% url 'my_save' %}" class="my-create-back-btn">
+        <span class="material-symbols-rounded">chevron_left</span>
+        이전
+    </a>
 
     <div class="page-header">
         <h1>내가 쓴 글</h1>
@@ -30,5 +35,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/my_creat.js' %}"></script>
+<script src="{% static 'js/my_create.js' %}?v=2"></script>
 {% endblock %}
