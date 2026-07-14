@@ -58,12 +58,31 @@
   color: #6b7280;
 }
 
+.image-description-row {
+  display: flex;
+  gap: 8px;
+}
+
 .image-description {
-  width: 100%;
+  flex: 1;
   padding: 8px 10px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   font-size: 13px;
+}
+
+.image-annotate-btn {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.image-annotate-btn:hover {
+  background: #f3f4f6;
 }
 
 #question-form-error {
