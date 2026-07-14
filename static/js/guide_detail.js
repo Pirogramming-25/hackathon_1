@@ -26,30 +26,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function createStep(imageData, index) {
-        const section = document.createElement('section');
-        section.id = `step${index + 1}`;
-        section.className = 'step-section';
+    const section = document.createElement('section');
+    section.id = `step${index + 1}`;
+    section.className = 'step-section';
 
-        const card = document.createElement('div');
-        card.className = 'step-card';
+    const card = document.createElement('div');
+    card.className = 'step-card';
 
+    // 이미지가 실제로 있을 때만 img 생성
+    if (imageData.image) {
         const image = document.createElement('img');
         image.className = 'step-image';
         image.src = imageData.image;
         image.alt = `${index + 1}단계 이미지`;
         image.loading = 'lazy';
         card.appendChild(image);
-
-        if (imageData.description) {
-            const description = document.createElement('p');
-            description.className = 'step-desc';
-            description.textContent = imageData.description;
-            card.appendChild(description);
-        }
-
-        section.appendChild(card);
-        return section;
     }
+
+    // 이미지가 없어도 설명은 출력
+    if (imageData.description) {
+        const description = document.createElement('p');
+        description.className = 'step-desc';
+        description.textContent = imageData.description;
+        card.appendChild(description);
+    }
+
+    section.appendChild(card);
+    return section;
+}
 
     function createStepLink(index) {
         const link = document.createElement('a');

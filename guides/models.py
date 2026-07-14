@@ -38,16 +38,33 @@ class Guide(models.Model):
 
 
 class GuideImage(models.Model):
-    guide = models.ForeignKey(Guide, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='guides/')
-    description = models.TextField(blank=True, help_text="단계별 설명") 
-    is_baked = models.BooleanField(default=False, help_text="이미지 가공 여부") 
+    guide = models.ForeignKey(
+        Guide,
+        on_delete=models.CASCADE,
+        related_name="images",
+    )
+    image = models.ImageField(
+        upload_to="guides/",
+        null=True,
+        blank=True,
+    )
+    description = models.TextField(
+        blank=True,
+        help_text="단계별 설명",
+    )
+    is_baked = models.BooleanField(
+        default=False,
+        help_text="이미지 가공 여부",
+    )
     display_order = models.PositiveIntegerField(default=1)
 
     class Meta:
-        ordering = ['display_order']
+        ordering = ["display_order"]
         constraints = [
-            models.UniqueConstraint(fields=['guide', 'display_order'], name='unique_guide_image_order')
+            models.UniqueConstraint(
+                fields=["guide", "display_order"],
+                name="unique_guide_image_order",
+            )
         ]
 
 class GuideLike(models.Model):
