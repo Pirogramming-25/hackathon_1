@@ -1,31 +1,54 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}질문 목록{% endblock %}
+{% block title %}질문 목록 | 똑디{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/question_list.css' %}">
 {% endblock %}
 
 {% block content %}
-<main class="question-list-page page-wrap">
-    <section class="question-list-header">
-        <div>
-            <h1>질문 목록</h1>
-            <p>디지털 사용 중 궁금한 내용을 확인하세요.</p>
-        </div>
-        <a href="{% url 'question_create' %}" class="btn btn-primary question-create-btn">
-            질문 등록
-        </a>
-    </section>
+{# active_nav = 'question_list' 를 view에서 context로 내려주면 네비게이션이 강조 표시됩니다 #}
 
-    <!-- 기존 ID 유지, 여기에 JS로 카드가 추가됩니다 -->
-    <section id="question-list" class="question-grid">
-        <p class="loading-msg">질문을 불러오는 중입니다.</p>
-    </section>
+<section class="question-list-page page-wrap">
 
-    <div id="pagination"></div>
-</main>
+  <div class="question-list-top">
+    <h1 class="text-h2 question-list-title">질문 목록</h1>
+    <p class="text-body question-list-desc">디지털 사용 중 궁금한 내용을 확인해보세요.</p>
+  </div>
+
+  <form class="question-search" id="questionSearchForm">
+    <input type="text"
+           name="q"
+           id="questionSearchInput"
+           class="question-search__input"
+           placeholder="궁금한 내용을 검색해보세요"
+           autocomplete="off">
+    <button type="submit" class="question-search__submit" aria-label="검색하기">
+      <span class="material-symbols-rounded">search</span>
+    </button>
+  </form>
+
+  <div class="question-toolbar">
+    <div class="question-sort" role="group" aria-label="정렬 방법 선택">
+      <button type="button" class="sort-btn is-active" data-sort="latest">최신순</button>
+      <button type="button" class="sort-btn" data-sort="saved">저장순</button>
+      <button type="button" class="sort-btn" data-sort="views">조회순</button>
+    </div>
+
+    <a href="{% url 'question_create' %}" class="btn btn-primary question-create-btn">
+      <span class="material-symbols-rounded">add</span> 질문 등록
+    </a>
+  </div>
+
+  <!-- 기존 ID 유지, JS로 카드가 여기 채워집니다 -->
+  <section id="question-list" class="question-grid">
+    <p class="loading-msg text-body">질문을 불러오는 중입니다.</p>
+  </section>
+
+  <div id="pagination"></div>
+
+</section>
 {% endblock %}
 
 {% block extra_js %}
