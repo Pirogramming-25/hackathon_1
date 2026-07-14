@@ -7,7 +7,7 @@ from django.db.models import Q, Count, Exists, OuterRef
 from django.contrib.auth import get_user_model
 
 # 모델 및 시리얼라이저 임포트 (공유 모델 포함)
-from .models import Guide, Visibility, GuideLike, GuideScrap, GuideShare
+from .models import Category, Guide, Visibility, GuideLike, GuideScrap, GuideShare
 from .serializers import GuideSerializer, GuidePromoteSerializer, GuideShareSerializer
 from .permissions import IsAuthorOrReadOnly
 from questions.models import Answer 
@@ -159,15 +159,28 @@ class GuideViewSet(viewsets.ModelViewSet):
         queryset = queryset.annotate(like_count=Count('likes', distinct=True), scrap_count=Count('scraps', distinct=True))
 
         category = self.request.query_params.get('category')
-        search = self.request.query_params.get('search')
+        search = self.request.query_params.get('search', '').strip()
         
         if category: 
             queryset = queryset.filter(category=category.upper())
         if search:
-            queryset = queryset.filter(
+            normalized_search = search.casefold()
+            matching_categories = [
+                value
+                for value, label in Category.choices
+                if normalized_search in value.casefold()
+                or normalized_search in label.casefold()
+                or label.casefold() in normalized_search
+            ]
+
+            search_query = (
                 Q(title__icontains=search)
                 | Q(images__description__icontains=search)
-            ).distinct()
+            )
+            if matching_categories:
+                search_query |= Q(category__in=matching_categories)
+
+            queryset = queryset.filter(search_query).distinct()
 
         sort = self.request.query_params.get('sort', 'latest')
         if sort == 'most_scrapped': 

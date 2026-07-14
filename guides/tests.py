@@ -155,6 +155,34 @@ class GuideListSearchTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn(guide.pk, guide_ids)
 
+    def test_search_includes_korean_category_name(self):
+        guide = Guide.objects.create(
+            author=self.author,
+            title="은행 앱 사용법",
+            category="FINANCE",
+            visibility=Visibility.PUBLIC,
+        )
+
+        response = self.client.get("/api/guides/", {"search": "금융"})
+        guide_ids = [item["id"] for item in response.data["data"]["results"]]
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(guide.pk, guide_ids)
+
+    def test_search_includes_category_code(self):
+        guide = Guide.objects.create(
+            author=self.author,
+            title="병원 앱 사용법",
+            category="MEDICAL",
+            visibility=Visibility.PUBLIC,
+        )
+
+        response = self.client.get("/api/guides/", {"search": "medical"})
+        guide_ids = [item["id"] for item in response.data["data"]["results"]]
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(guide.pk, guide_ids)
+
     def test_list_response_contains_page_size(self):
         for index in range(11):
             Guide.objects.create(
