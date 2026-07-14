@@ -148,12 +148,20 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 CLOUDINARY_URL = os.getenv("CLOUDINARY_URL")
+CLOUDINARY_CREDENTIALS = (
+    os.getenv("CLOUDINARY_CLOUD_NAME"),
+    os.getenv("CLOUDINARY_API_KEY"),
+    os.getenv("CLOUDINARY_API_SECRET"),
+)
+CLOUDINARY_CONFIGURED = bool(
+    CLOUDINARY_URL or all(CLOUDINARY_CREDENTIALS)
+)
 
 STORAGES = {
     "default": {
         "BACKEND": (
             "cloudinary_storage.storage.MediaCloudinaryStorage"
-            if CLOUDINARY_URL
+            if CLOUDINARY_CONFIGURED
             else "django.core.files.storage.FileSystemStorage"
         ),
     },
