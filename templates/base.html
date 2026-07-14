@@ -44,7 +44,7 @@
       </a>
 
       <a
-        href="#"
+        href="{% if user.is_authenticated %}{% url 'my_save' %}{% else %}{% url 'login' %}?next={% url 'my_save' %}{% endif %}"
         class="nav-btn {% if active_nav == 'storage' %}is-active{% endif %}"
       >
         <span class="material-symbols-rounded">bookmark</span>
@@ -52,7 +52,7 @@
       </a>
 
       <a
-        href="{% if user.is_authenticated %}{% url 'my_info' %}{% else %}{% url 'login' %}?next={% url 'my_info' %}{% endif %}"
+        href="{% if user.is_authenticated %}{% url 'my_page' %}{% else %}{% url 'login' %}?next={% url 'my_page' %}{% endif %}"
         class="nav-btn {% if active_nav == 'my_info' %}is-active{% endif %}"
       >
         <span class="material-symbols-rounded">person</span>
