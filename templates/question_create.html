@@ -15,6 +15,15 @@
 {% block content %}
 <div class="question-create-page">
 
+    <a
+        href="{% url 'question_page_list' %}"
+        class="question-create-back-btn"
+        aria-label="질문 목록으로 돌아가기"
+    >
+        <span class="material-symbols-rounded">chevron_left</span>
+        이전
+    </a>
+
     <div class="page-header">
         <h1>질문 등록</h1>
         <p>
@@ -110,7 +119,7 @@
                 </p>
 
                 <small>
-                    JPG, PNG, WEBP · 파일당 5MB · 최대 20장
+                    JPG, PNG, WEBP · 파일당 5MB · 최대 5장
                 </small>
 
                 <input
@@ -215,7 +224,7 @@
 
                     <textarea
                         id="imageDescription"
-                        maxlength="2000"
+                        maxlength="200"
                         rows="4"
                         placeholder="예) 이 버튼을 눌러도 다음 화면으로 안 넘어가요."
                     ></textarea>

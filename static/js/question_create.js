@@ -1,6 +1,6 @@
 /* static/js/question_create.js */
 
-const QUESTION_MAX_IMAGES = 20;
+const QUESTION_MAX_IMAGES = 5;
 const QUESTION_MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const QUESTION_ALLOWED_TYPES = new Set([
@@ -730,6 +730,20 @@ async function submitQuestion(event) {
     return;
   }
 
+  const content = questionImages
+    .map((item) => item.description.trim())
+    .filter(Boolean)
+    .join("\n");
+
+  if (!content) {
+    showError(
+      "등록한 화면에 궁금한 내용을 입력해주세요."
+    );
+
+    imageDescription.focus();
+    return;
+  }
+
   for (const item of questionImages) {
     if (
       item.file.size >
@@ -756,20 +770,20 @@ async function submitQuestion(event) {
     category
   );
 
+  formData.append(
+    "content",
+    content
+  );
+
   questionImages.forEach((item) => {
     formData.append(
-      "uploaded_images",
+      "images",
       item.file
     );
 
     formData.append(
-      "uploaded_descriptions",
+      "image_descriptions",
       item.description.trim()
-    );
-
-    formData.append(
-      "uploaded_is_baked",
-      String(item.isBaked)
     );
   });
 
