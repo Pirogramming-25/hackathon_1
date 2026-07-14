@@ -1,50 +1,79 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}질문 상세{% endblock %}
+{% block title %}질문 상세 | 똑디{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/question_detail.css' %}">
 {% endblock %}
 
 {% block content %}
-<main
-    class="question-detail-page"
+{# active_nav = 'question_list' 을 view에서 내려주면 네비게이션이 강조 표시됩니다 #}
+
+<div
+    class="question-detail-page page-wrap"
     data-question-id="{{ view.kwargs.pk }}"
     data-current-user="{{ user.username }}"
 >
-    <section id="question-detail">
-        <p>질문을 불러오는 중입니다.</p>
-    </section>
+    <button type="button" class="detail-back-btn" id="detailBackBtn">
+        <span class="material-symbols-rounded">chevron_left</span>
+        이전
+    </button>
 
-    <section id="answer-section">
-        <h2>답변</h2>
-        <div id="answer-list"></div>
+    <!-- JS가 여기에 질문 헤더 + 본문을 채웁니다 -->
+    <p class="detail-status" id="detailStatus" role="status">질문을 불러오는 중입니다.</p>
 
-        <form id="answer-form">
+    <section id="question-detail" hidden></section>
+
+    <section id="answer-section" class="answer-section">
+        <h2 class="text-h2 answer-section__title">답변</h2>
+
+        <!-- JS가 여기에 답변 카드 목록을 채웁니다 -->
+        <div id="answer-list" class="answer-list"></div>
+
+        <form id="answer-form" class="answer-form card">
+            <label for="answer-content" class="answer-form__label">답변을 남겨주세요</label>
+
             <textarea
                 id="answer-content"
+                class="answer-form__textarea"
                 rows="6"
                 placeholder="답변을 입력하세요."
                 required
             ></textarea>
 
-            <input
-                type="file"
-                id="answer-images"
-                accept="image/jpeg,image/png,image/webp"
-                multiple
-            >
+            <div class="answer-form__upload">
+                <label for="answer-images" class="answer-form__upload-btn">
+                    <span class="material-symbols-rounded">add_photo_alternate</span>
+                    사진 첨부
+                </label>
+                <input
+                    type="file"
+                    id="answer-images"
+                    accept="image/jpeg,image/png,image/webp"
+                    multiple
+                    hidden
+                >
+                <span class="answer-form__upload-hint text-small">최대 4장 · 파일당 5MB</span>
+            </div>
 
-            <div id="answer-image-description-list"></div>
+            <div id="answer-image-description-list" class="answer-image-description-list"></div>
 
-            <button type="submit">답변 등록</button>
+            <div class="answer-form__submit-area">
+                <button type="submit" class="btn btn-primary">답변 등록</button>
+            </div>
         </form>
     </section>
-</main>
+
+    <form hidden>{% csrf_token %}</form>
+</div>
 {% endblock %}
 
 {% block extra_js %}
+<script>
+    window.DDOKDI_IS_AUTHENTICATED = {{ user.is_authenticated|yesno:"true,false" }};
+    window.DDOKDI_LOGIN_URL = "{% url 'accounts:login' %}";
+</script>
 <script src="{% static 'js/image-annotator.js' %}"></script>
 <script src="{% static 'js/question_detail.js' %}"></script>
 {% endblock %}
